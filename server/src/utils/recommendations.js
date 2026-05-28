@@ -34,7 +34,7 @@ const SPECIALIZATION_KEYWORDS = {
   pulmonology: ['cough', 'breath', 'asthma', 'shortness', 'wheezing'],
   ent: ['ear', 'nose', 'throat', 'sinus', 'tonsil'],
   ophthalmology: ['eye', 'vision', 'blurred', 'redness'],
-  family medicine: ['general', 'checkup', 'flu', 'fever', 'cold']
+  family_medicine: ['general', 'checkup', 'flu', 'fever', 'cold']
 };
 
 const tokenize = (text) =>
