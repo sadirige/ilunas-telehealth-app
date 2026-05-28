@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const APPOINTMENT_STATUS = ['scheduled', 'canceled'];
+const APPOINTMENT_STATUS = ['scheduled', 'canceled', 'completed'];
 
 // Appointments link patients to doctors for telehealth sessions.
 const appointmentSchema = new mongoose.Schema(

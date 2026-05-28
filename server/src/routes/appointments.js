@@ -3,6 +3,7 @@ const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
 const { Appointment } = require('../models/Appointment');
 const { DoctorProfile } = require('../models/DoctorProfile');
+const { Availability } = require('../models/Availability');
 const { requireFields, formatMissingFieldsMessage } = require('../utils/validation');
 
 const router = express.Router();
@@ -28,6 +29,21 @@ const buildAppointmentResponse = (appointment) => ({
   meetingUrl: appointment.meetingUrl,
   status: appointment.status
 });
+
+const getAppointmentEnd = (startAt, durationMinutes) =>
+  new Date(startAt.getTime() + durationMinutes * 60 * 1000);
+
+const doctorHasAvailability = async (doctorId, startAt, durationMinutes) => {
+  const endAt = getAppointmentEnd(startAt, durationMinutes);
+  const availability = await Availability.findOne({
+    doctor: doctorId,
+    isAvailable: true,
+    startAt: { $lte: startAt },
+    endAt: { $gte: endAt }
+  });
+
+  return Boolean(availability);
+};
 
 router.post('/', requirePatient, async (req, res, next) => {
   try {
@@ -61,12 +77,18 @@ router.post('/', requirePatient, async (req, res, next) => {
       return res.status(409).json({ message: 'Doctor is not available at that time' });
     }
 
+    const duration = durationMinutes || 30;
+    const hasAvailability = await doctorHasAvailability(doctorProfile.user, parsedDate, duration);
+    if (!hasAvailability) {
+      return res.status(409).json({ message: 'Doctor is not available at that time' });
+    }
+
     const appointment = await Appointment.create({
       patient: req.user.id,
       doctor: doctorProfile.user,
       doctorProfile: doctorProfile.id,
       scheduledAt: parsedDate,
-      durationMinutes,
+      durationMinutes: duration,
       reason: reason || '',
       meetingUrl: meetingUrl || ''
     });
@@ -137,6 +159,12 @@ router.patch('/:appointmentId/reschedule', requirePatient, async (req, res, next
       return res.status(409).json({ message: 'Doctor is not available at that time' });
     }
 
+    const duration = appointment.durationMinutes || 30;
+    const hasAvailability = await doctorHasAvailability(appointment.doctor, parsedDate, duration);
+    if (!hasAvailability) {
+      return res.status(409).json({ message: 'Doctor is not available at that time' });
+    }
+
     appointment.scheduledAt = parsedDate;
     await appointment.save();
 
@@ -155,6 +183,28 @@ router.patch('/:appointmentId/cancel', requirePatient, async (req, res, next) =>
         status: 'scheduled'
       },
       { $set: { status: 'canceled' } },
+      updateOptions
+    );
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch('/:appointmentId/complete', requireDoctor, async (req, res, next) => {
+  try {
+    const appointment = await Appointment.findOneAndUpdate(
+      {
+        _id: req.params.appointmentId,
+        doctor: req.user.id,
+        status: 'scheduled'
+      },
+      { $set: { status: 'completed' } },
       updateOptions
     );
 
