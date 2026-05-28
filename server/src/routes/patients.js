@@ -2,10 +2,18 @@ const express = require('express');
 const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
 const { PatientProfile } = require('../models/PatientProfile');
+const {
+  requireFields,
+  requireNestedFields,
+  formatMissingFieldsMessage
+} = require('../utils/validation');
 
 const router = express.Router();
 
 const requirePatient = [authenticate, requireRole(['patient'])];
+
+// Ensures Mongoose validators run on PATCH updates.
+const updateOptions = { new: true, runValidators: true, context: 'query' };
 
 router.post('/profile', requirePatient, async (req, res, next) => {
   try {
@@ -19,14 +27,18 @@ router.post('/profile', requirePatient, async (req, res, next) => {
       medicalHistory
     } = req.body || {};
 
-    if (!name || !birthday || !weight || !height || !contactDetails || !medicalHistory) {
-      return res.status(400).json({ message: 'Missing required profile fields' });
-    }
-
-    const hasContactDetails =
-      contactDetails.phone && contactDetails.address && contactDetails.emergencyContact;
-    if (!hasContactDetails) {
-      return res.status(400).json({ message: 'Contact details are incomplete' });
+    const missingFields = requireFields(
+      { name, birthday, weight, height, contactDetails, medicalHistory },
+      ['name', 'birthday', 'weight', 'height', 'contactDetails', 'medicalHistory']
+    );
+    const missingContact = requireNestedFields(contactDetails, 'contactDetails', [
+      'phone',
+      'address',
+      'emergencyContact'
+    ]);
+    const missing = [...missingFields, ...missingContact];
+    if (missing.length > 0) {
+      return res.status(400).json({ message: formatMissingFieldsMessage(missing) });
     }
 
     const existingProfile = await PatientProfile.findOne({ user: req.user.id });
@@ -71,7 +83,7 @@ router.patch('/profile/me', requirePatient, async (req, res, next) => {
     const profile = await PatientProfile.findOneAndUpdate(
       { user: req.user.id },
       { $set: updates },
-      { new: true }
+      updateOptions
     );
 
     if (!profile) {
