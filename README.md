@@ -541,6 +541,25 @@ pm.test('Notifications return a list', function () {
 });
 ```
 
+GET `/api/notifications/stream`
+
+Notes
+
+- This is a Server-Sent Events (SSE) stream that stays open.
+- Use the `Authorization: Bearer <token>` header.
+- Postman can open the stream, but it will not terminate until you stop it.
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('SSE stream is open', function () {
+	pm.expect(pm.response.headers.get('Content-Type')).to.include('text/event-stream');
+});
+```
+
 GET `/api/notifications/unread-count`
 
 Response

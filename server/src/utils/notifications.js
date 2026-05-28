@@ -1,4 +1,5 @@
 const { Notification } = require('../models/Notification');
+const { emitToUser } = require('./notificationStream');
 
 const buildNotification = ({ user, type, title, message, data }) => ({
   user,
@@ -14,7 +15,16 @@ const createNotificationSafe = async (payload) => {
       return;
     }
 
-    await Notification.create(buildNotification(payload));
+    const notification = await Notification.create(buildNotification(payload));
+    emitToUser(notification.user, {
+      id: notification.id,
+      type: notification.type,
+      title: notification.title,
+      message: notification.message,
+      data: notification.data,
+      readAt: notification.readAt,
+      createdAt: notification.createdAt
+    });
   } catch (error) {
     console.error('Failed to create notification', error);
   }

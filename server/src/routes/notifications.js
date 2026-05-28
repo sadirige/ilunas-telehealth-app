@@ -1,6 +1,7 @@
 const express = require('express');
 const { authenticate } = require('../middleware/auth');
 const { Notification } = require('../models/Notification');
+const { addClient } = require('../utils/notificationStream');
 
 const router = express.Router();
 
@@ -45,6 +46,28 @@ router.get('/', authenticate, async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+});
+
+router.get('/stream', authenticate, (req, res) => {
+  res.status(200);
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive'
+  });
+  res.flushHeaders();
+
+  res.write('event: connected\ndata: {}\n\n');
+
+  const cleanup = addClient(req.user.id, res);
+  const heartbeat = setInterval(() => {
+    res.write('event: heartbeat\ndata: {}\n\n');
+  }, 25000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    cleanup();
+  });
 });
 
 router.get('/unread-count', authenticate, async (req, res, next) => {

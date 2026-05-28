@@ -3,6 +3,7 @@ const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
 const { Availability } = require('../models/Availability');
 const { requireFields, formatMissingFieldsMessage } = require('../utils/validation');
+const { createNotificationSafe } = require('../utils/notifications');
 
 const router = express.Router();
 
@@ -43,6 +44,14 @@ router.post('/', requireDoctor, async (req, res, next) => {
       startAt: parsedStart,
       endAt: parsedEnd,
       isAvailable: true
+    });
+
+    await createNotificationSafe({
+      user: req.user.id,
+      type: 'availability_created',
+      title: 'Availability added',
+      message: 'Your schedule was updated.',
+      data: { availabilityId: availability.id }
     });
 
     return res.status(201).json({ availability: buildAvailabilityResponse(availability) });
@@ -114,6 +123,14 @@ router.delete('/:availabilityId', requireDoctor, async (req, res, next) => {
     if (!availability) {
       return res.status(404).json({ message: 'Availability not found' });
     }
+
+    await createNotificationSafe({
+      user: req.user.id,
+      type: 'availability_removed',
+      title: 'Availability removed',
+      message: 'Your schedule was updated.',
+      data: { availabilityId: availability.id }
+    });
 
     return res.status(200).json({ availability: buildAvailabilityResponse(availability) });
   } catch (error) {

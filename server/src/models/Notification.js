@@ -4,7 +4,9 @@ const NOTIFICATION_TYPES = [
   'appointment_booked',
   'appointment_rescheduled',
   'appointment_canceled',
-  'appointment_completed'
+  'appointment_completed',
+  'availability_created',
+  'availability_removed'
 ];
 
 // Notifications are stored for polling and status tracking.
