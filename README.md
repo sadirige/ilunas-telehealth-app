@@ -442,6 +442,114 @@ Response
 }
 ```
 
+### Notifications
+
+GET `/api/notifications?status=unread&limit=20`
+
+Response
+```json
+{
+	"results": [
+		{
+			"id": "<notificationId>",
+			"type": "appointment_booked",
+			"title": "Appointment booked",
+			"message": "Your appointment is scheduled.",
+			"data": {
+				"appointmentId": "<appointmentId>"
+			},
+			"readAt": null,
+			"createdAt": "2026-05-28T12:00:00.000Z"
+		}
+	]
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Notifications return a list', function () {
+	const data = pm.response.json();
+	pm.expect(data.results).to.be.an('array');
+});
+```
+
+GET `/api/notifications/unread-count`
+
+Response
+```json
+{
+	"unreadCount": 2
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Unread count is a number', function () {
+	const data = pm.response.json();
+	pm.expect(data.unreadCount).to.be.a('number');
+});
+```
+
+PATCH `/api/notifications/:notificationId/read`
+
+Response
+```json
+{
+	"notification": {
+		"id": "<notificationId>",
+		"type": "appointment_booked",
+		"title": "Appointment booked",
+		"message": "Your appointment is scheduled.",
+		"data": {
+			"appointmentId": "<appointmentId>"
+		},
+		"readAt": "2026-05-28T12:05:00.000Z",
+		"createdAt": "2026-05-28T12:00:00.000Z"
+	}
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Notification is marked read', function () {
+	const data = pm.response.json();
+	pm.expect(data.notification.readAt).to.exist;
+});
+```
+
+PATCH `/api/notifications/read-all`
+
+Response
+```json
+{
+	"updated": 3
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Updated count is a number', function () {
+	const data = pm.response.json();
+	pm.expect(data.updated).to.be.a('number');
+});
+```
+
 ### Code Splitting
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)

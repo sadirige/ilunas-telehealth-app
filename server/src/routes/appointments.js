@@ -5,6 +5,7 @@ const { Appointment } = require('../models/Appointment');
 const { DoctorProfile } = require('../models/DoctorProfile');
 const { Availability } = require('../models/Availability');
 const { requireFields, formatMissingFieldsMessage } = require('../utils/validation');
+const { createNotificationSafe } = require('../utils/notifications');
 
 const router = express.Router();
 
@@ -93,6 +94,23 @@ router.post('/', requirePatient, async (req, res, next) => {
       meetingUrl: meetingUrl || ''
     });
 
+    await Promise.all([
+      createNotificationSafe({
+        user: req.user.id,
+        type: 'appointment_booked',
+        title: 'Appointment booked',
+        message: 'Your appointment is scheduled.',
+        data: { appointmentId: appointment.id }
+      }),
+      createNotificationSafe({
+        user: doctorProfile.user,
+        type: 'appointment_booked',
+        title: 'New appointment booked',
+        message: 'A patient booked a consultation.',
+        data: { appointmentId: appointment.id }
+      })
+    ]);
+
     return res.status(201).json({ appointment: buildAppointmentResponse(appointment) });
   } catch (error) {
     return next(error);
@@ -168,6 +186,23 @@ router.patch('/:appointmentId/reschedule', requirePatient, async (req, res, next
     appointment.scheduledAt = parsedDate;
     await appointment.save();
 
+    await Promise.all([
+      createNotificationSafe({
+        user: appointment.patient,
+        type: 'appointment_rescheduled',
+        title: 'Appointment rescheduled',
+        message: 'Your appointment time was updated.',
+        data: { appointmentId: appointment.id }
+      }),
+      createNotificationSafe({
+        user: appointment.doctor,
+        type: 'appointment_rescheduled',
+        title: 'Appointment rescheduled',
+        message: 'A patient rescheduled their appointment.',
+        data: { appointmentId: appointment.id }
+      })
+    ]);
+
     return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
   } catch (error) {
     return next(error);
@@ -190,6 +225,14 @@ router.patch('/:appointmentId/cancel', requirePatient, async (req, res, next) =>
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
+    await createNotificationSafe({
+      user: appointment.doctor,
+      type: 'appointment_canceled',
+      title: 'Appointment canceled',
+      message: 'A patient canceled their appointment.',
+      data: { appointmentId: appointment.id }
+    });
+
     return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
   } catch (error) {
     return next(error);
@@ -211,6 +254,14 @@ router.patch('/:appointmentId/complete', requireDoctor, async (req, res, next) =
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
+
+    await createNotificationSafe({
+      user: appointment.patient,
+      type: 'appointment_completed',
+      title: 'Appointment completed',
+      message: 'Your appointment was marked as completed.',
+      data: { appointmentId: appointment.id }
+    });
 
     return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
   } catch (error) {
