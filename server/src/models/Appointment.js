@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const APPOINTMENT_STATUS = ['scheduled', 'canceled', 'completed'];
+const APPOINTMENT_STATUS = ['scheduled', 'in_progress', 'no_show', 'canceled', 'completed'];
 const MEETING_PROVIDERS = ['google_meet', 'zoom', 'jitsi', 'custom'];
 
 // Appointments link patients to doctors for telehealth sessions.

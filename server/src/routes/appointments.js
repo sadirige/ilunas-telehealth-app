@@ -1,7 +1,7 @@
 const express = require('express');
 const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
-const { Appointment, MEETING_PROVIDERS } = require('../models/Appointment');
+const { Appointment, MEETING_PROVIDERS, APPOINTMENT_STATUS } = require('../models/Appointment');
 const { DoctorProfile } = require('../models/DoctorProfile');
 const { Availability } = require('../models/Availability');
 const { requireFields, formatMissingFieldsMessage } = require('../utils/validation');
@@ -265,6 +265,36 @@ router.patch('/:appointmentId/complete', requireDoctor, async (req, res, next) =
       message: 'Your appointment was marked as completed.',
       data: { appointmentId: appointment.id }
     });
+
+    return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch('/:appointmentId/status', requireDoctor, async (req, res, next) => {
+  try {
+    const { status } = req.body || {};
+
+    if (!status || !APPOINTMENT_STATUS.includes(status)) {
+      return res.status(400).json({ message: 'Invalid appointment status' });
+    }
+
+    const appointment = await Appointment.findOne({
+      _id: req.params.appointmentId,
+      doctor: req.user.id
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    if (appointment.status === 'canceled') {
+      return res.status(400).json({ message: 'Canceled appointments cannot be updated' });
+    }
+
+    appointment.status = status;
+    await appointment.save();
 
     return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
   } catch (error) {
