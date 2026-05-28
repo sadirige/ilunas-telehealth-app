@@ -252,6 +252,107 @@ Response
 }
 ```
 
+### Appointments
+
+POST `/api/appointments`
+
+Response
+```json
+{
+	"appointment": {
+		"id": "<appointmentId>",
+		"patient": "<patientUserId>",
+		"doctor": "<doctorUserId>",
+		"doctorProfile": "<doctorProfileId>",
+		"scheduledAt": "2026-05-30T15:00:00.000Z",
+		"durationMinutes": 30,
+		"reason": "Headache",
+		"meetingUrl": "https://meet.example.com/room",
+		"status": "scheduled"
+	}
+}
+```
+
+GET `/api/appointments/patient`
+
+Response
+```json
+{
+	"results": [
+		{
+			"id": "<appointmentId>",
+			"patient": "<patientUserId>",
+			"doctor": "<doctorUserId>",
+			"doctorProfile": "<doctorProfileId>",
+			"scheduledAt": "2026-05-30T15:00:00.000Z",
+			"durationMinutes": 30,
+			"reason": "Headache",
+			"meetingUrl": "https://meet.example.com/room",
+			"status": "scheduled"
+		}
+	]
+}
+```
+
+GET `/api/appointments/doctor`
+
+Response
+```json
+{
+	"results": [
+		{
+			"id": "<appointmentId>",
+			"patient": "<patientUserId>",
+			"doctor": "<doctorUserId>",
+			"doctorProfile": "<doctorProfileId>",
+			"scheduledAt": "2026-05-30T15:00:00.000Z",
+			"durationMinutes": 30,
+			"reason": "Headache",
+			"meetingUrl": "https://meet.example.com/room",
+			"status": "scheduled"
+		}
+	]
+}
+```
+
+PATCH `/api/appointments/:appointmentId/reschedule`
+
+Response
+```json
+{
+	"appointment": {
+		"id": "<appointmentId>",
+		"patient": "<patientUserId>",
+		"doctor": "<doctorUserId>",
+		"doctorProfile": "<doctorProfileId>",
+		"scheduledAt": "2026-06-01T16:00:00.000Z",
+		"durationMinutes": 30,
+		"reason": "Headache",
+		"meetingUrl": "https://meet.example.com/room",
+		"status": "scheduled"
+	}
+}
+```
+
+PATCH `/api/appointments/:appointmentId/cancel`
+
+Response
+```json
+{
+	"appointment": {
+		"id": "<appointmentId>",
+		"patient": "<patientUserId>",
+		"doctor": "<doctorUserId>",
+		"doctorProfile": "<doctorProfileId>",
+		"scheduledAt": "2026-05-30T15:00:00.000Z",
+		"durationMinutes": 30,
+		"reason": "Headache",
+		"meetingUrl": "https://meet.example.com/room",
+		"status": "canceled"
+	}
+}
+```
+
 ### Code Splitting
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)

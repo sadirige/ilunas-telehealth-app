@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const authRoutes = require('./routes/auth');
 const patientRoutes = require('./routes/patients');
 const doctorRoutes = require('./routes/doctors');
+const appointmentRoutes = require('./routes/appointments');
 
 const createApp = () => {
   const app = express();
@@ -23,6 +24,7 @@ const createApp = () => {
   app.use('/api/auth', authRoutes);
   app.use('/api/patients', patientRoutes);
   app.use('/api/doctors', doctorRoutes);
+  app.use('/api/appointments', appointmentRoutes);
 
   app.use((req, res) => {
     return res.status(404).json({ message: 'Not found' });
