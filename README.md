@@ -550,6 +550,49 @@ pm.test('Updated count is a number', function () {
 });
 ```
 
+### AI Recommendations (Keyword-Based MVP)
+
+POST `/api/recommendations`
+
+Request
+```json
+{
+	"symptoms": "headache and dizziness",
+	"limit": 5
+}
+```
+
+Response
+```json
+{
+	"query": "headache and dizziness",
+	"matchedSpecializations": ["neurology"],
+	"recommendations": [
+		{
+			"id": "<profileId>",
+			"userId": "<userId>",
+			"name": "Dr. Jane Smith",
+			"bio": "Board-certified family physician.",
+			"specialization": "Neurology",
+			"profilePictureUrl": "https://example.com/doctor.jpg",
+			"score": 2.25
+		}
+	]
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Recommendations include a list', function () {
+	const data = pm.response.json();
+	pm.expect(data.recommendations).to.be.an('array');
+});
+```
+
 ### Code Splitting
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)

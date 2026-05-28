@@ -10,6 +10,7 @@ const recordRoutes = require('./routes/records');
 const noteRoutes = require('./routes/notes');
 const prescriptionRoutes = require('./routes/prescriptions');
 const notificationRoutes = require('./routes/notifications');
+const recommendationRoutes = require('./routes/recommendations');
 
 const createApp = () => {
   const app = express();
@@ -35,6 +36,7 @@ const createApp = () => {
   app.use('/api/notes', noteRoutes);
   app.use('/api/prescriptions', prescriptionRoutes);
   app.use('/api/notifications', notificationRoutes);
+  app.use('/api/recommendations', recommendationRoutes);
 
   app.use((req, res) => {
     return res.status(404).json({ message: 'Not found' });
