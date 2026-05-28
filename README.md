@@ -353,6 +353,70 @@ Response
 }
 ```
 
+PATCH `/api/appointments/:appointmentId/meeting`
+
+Response
+```json
+{
+	"appointment": {
+		"id": "<appointmentId>",
+		"patient": "<patientUserId>",
+		"doctor": "<doctorUserId>",
+		"doctorProfile": "<doctorProfileId>",
+		"scheduledAt": "2026-05-30T15:00:00.000Z",
+		"durationMinutes": 30,
+		"reason": "Headache",
+		"meetingUrl": "https://meet.jit.si/ilunas-123",
+		"meetingProvider": "jitsi",
+		"meetingHostUrl": "https://meet.jit.si/ilunas-123#host",
+		"meetingMeta": {
+			"roomName": "ilunas-123"
+		},
+		"status": "scheduled"
+	}
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Meeting details are present', function () {
+	const data = pm.response.json();
+	pm.expect(data.appointment.meetingUrl).to.exist;
+});
+```
+
+GET `/api/appointments/:appointmentId/meeting`
+
+Response
+```json
+{
+	"meeting": {
+		"meetingUrl": "https://meet.jit.si/ilunas-123",
+		"meetingProvider": "jitsi",
+		"meetingHostUrl": "https://meet.jit.si/ilunas-123#host",
+		"meetingMeta": {
+			"roomName": "ilunas-123"
+		}
+	}
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Meeting payload includes url', function () {
+	const data = pm.response.json();
+	pm.expect(data.meeting.meetingUrl).to.exist;
+});
+```
+
 ### Availabilities
 
 POST `/api/availabilities`

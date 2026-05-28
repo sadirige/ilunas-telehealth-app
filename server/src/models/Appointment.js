@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const APPOINTMENT_STATUS = ['scheduled', 'canceled', 'completed'];
+const MEETING_PROVIDERS = ['google_meet', 'zoom', 'jitsi', 'custom'];
 
 // Appointments link patients to doctors for telehealth sessions.
 const appointmentSchema = new mongoose.Schema(
@@ -39,6 +40,18 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
+    meetingProvider: {
+      type: String,
+      enum: MEETING_PROVIDERS
+    },
+    meetingHostUrl: {
+      type: String,
+      trim: true
+    },
+    meetingMeta: {
+      type: Object,
+      default: {}
+    },
     status: {
       type: String,
       enum: APPOINTMENT_STATUS,
@@ -53,4 +66,4 @@ appointmentSchema.index({ patient: 1, scheduledAt: 1 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-module.exports = { Appointment, APPOINTMENT_STATUS };
+module.exports = { Appointment, APPOINTMENT_STATUS, MEETING_PROVIDERS };

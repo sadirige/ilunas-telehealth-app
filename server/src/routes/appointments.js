@@ -1,7 +1,7 @@
 const express = require('express');
 const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/requireRole');
-const { Appointment } = require('../models/Appointment');
+const { Appointment, MEETING_PROVIDERS } = require('../models/Appointment');
 const { DoctorProfile } = require('../models/DoctorProfile');
 const { Availability } = require('../models/Availability');
 const { requireFields, formatMissingFieldsMessage } = require('../utils/validation');
@@ -28,6 +28,9 @@ const buildAppointmentResponse = (appointment) => ({
   durationMinutes: appointment.durationMinutes,
   reason: appointment.reason,
   meetingUrl: appointment.meetingUrl,
+  meetingProvider: appointment.meetingProvider,
+  meetingHostUrl: appointment.meetingHostUrl,
+  meetingMeta: appointment.meetingMeta,
   status: appointment.status
 });
 
@@ -264,6 +267,72 @@ router.patch('/:appointmentId/complete', requireDoctor, async (req, res, next) =
     });
 
     return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch('/:appointmentId/meeting', requireDoctor, async (req, res, next) => {
+  try {
+    const { meetingUrl, meetingProvider, meetingHostUrl, meetingMeta } = req.body || {};
+
+    if (!meetingUrl) {
+      return res.status(400).json({ message: 'meetingUrl is required' });
+    }
+
+    if (meetingProvider && !MEETING_PROVIDERS.includes(meetingProvider)) {
+      return res.status(400).json({ message: 'Invalid meeting provider' });
+    }
+
+    const appointment = await Appointment.findOneAndUpdate(
+      {
+        _id: req.params.appointmentId,
+        doctor: req.user.id
+      },
+      {
+        $set: {
+          meetingUrl,
+          meetingProvider: meetingProvider || 'custom',
+          meetingHostUrl: meetingHostUrl || '',
+          meetingMeta: meetingMeta || {}
+        }
+      },
+      updateOptions
+    );
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/:appointmentId/meeting', authenticate, async (req, res, next) => {
+  try {
+    const appointment = await Appointment.findById(req.params.appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    const isParticipant =
+      appointment.patient.toString() === req.user.id ||
+      appointment.doctor.toString() === req.user.id;
+
+    if (!isParticipant) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    return res.status(200).json({
+      meeting: {
+        meetingUrl: appointment.meetingUrl,
+        meetingProvider: appointment.meetingProvider,
+        meetingHostUrl: appointment.meetingHostUrl,
+        meetingMeta: appointment.meetingMeta
+      }
+    });
   } catch (error) {
     return next(error);
   }
