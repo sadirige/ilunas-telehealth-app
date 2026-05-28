@@ -166,6 +166,48 @@ Response
 }
 ```
 
+PATCH `/api/patients/profile/me/picture`
+
+Request
+```json
+{
+	"profilePictureUrl": "https://res.cloudinary.com/<cloud_name>/image/upload/v12345/patient.jpg"
+}
+```
+
+Response
+```json
+{
+	"profile": {
+		"id": "<profileId>",
+		"user": "<userId>",
+		"name": "Patient One",
+		"birthday": "1998-05-10T00:00:00.000Z",
+		"weight": 70,
+		"height": 170,
+		"profilePictureUrl": "https://res.cloudinary.com/<cloud_name>/image/upload/v12345/patient.jpg",
+		"contactDetails": {
+			"phone": "+1-555-0100",
+			"address": "123 Main St",
+			"emergencyContact": "+1-555-0199"
+		},
+		"medicalHistory": "Asthma, seasonal allergies"
+	}
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Profile picture URL is updated', function () {
+	const data = pm.response.json();
+	pm.expect(data.profile.profilePictureUrl).to.exist;
+});
+```
+
 ### Doctor Profiles
 
 POST `/api/doctors/profile`
@@ -215,6 +257,46 @@ Response
 	}
 }
 ```
+
+PATCH `/api/doctors/profile/me/picture`
+
+Request
+```json
+{
+	"profilePictureUrl": "https://res.cloudinary.com/<cloud_name>/image/upload/v12345/doctor.jpg"
+}
+```
+
+Response
+```json
+{
+	"profile": {
+		"id": "<profileId>",
+		"user": "<userId>",
+		"name": "Dr. Jane Smith",
+		"bio": "Board-certified family physician with 10 years of experience.",
+		"specialization": "Family Medicine",
+		"profilePictureUrl": "https://res.cloudinary.com/<cloud_name>/image/upload/v12345/doctor.jpg"
+	}
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Profile picture URL is updated', function () {
+	const data = pm.response.json();
+	pm.expect(data.profile.profilePictureUrl).to.exist;
+});
+```
+
+Profile picture upload note (Cloudinary)
+
+- Use an unsigned upload preset in Cloudinary from the client.
+- Save the resulting `secure_url` back to the profile via the endpoints above.
 
 ### Doctor Discovery (Patient-Only)
 

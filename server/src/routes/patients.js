@@ -5,7 +5,8 @@ const { PatientProfile } = require('../models/PatientProfile');
 const {
   requireFields,
   requireNestedFields,
-  formatMissingFieldsMessage
+  formatMissingFieldsMessage,
+  isValidUrl
 } = require('../utils/validation');
 
 const router = express.Router();
@@ -83,6 +84,30 @@ router.patch('/profile/me', requirePatient, async (req, res, next) => {
     const profile = await PatientProfile.findOneAndUpdate(
       { user: req.user.id },
       { $set: updates },
+      updateOptions
+    );
+
+    if (!profile) {
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    return res.status(200).json({ profile });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch('/profile/me/picture', requirePatient, async (req, res, next) => {
+  try {
+    const { profilePictureUrl } = req.body || {};
+
+    if (!profilePictureUrl || !isValidUrl(profilePictureUrl)) {
+      return res.status(400).json({ message: 'profilePictureUrl must be a valid URL' });
+    }
+
+    const profile = await PatientProfile.findOneAndUpdate(
+      { user: req.user.id },
+      { $set: { profilePictureUrl } },
       updateOptions
     );
 

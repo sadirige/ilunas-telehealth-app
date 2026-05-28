@@ -15,8 +15,22 @@ const requireNestedFields = (payload, field, nestedFields) => {
 const formatMissingFieldsMessage = (missingFields) =>
   `Missing required fields: ${missingFields.join(', ')}`;
 
+const isValidUrl = (value) => {
+  if (!value || typeof value !== 'string') {
+    return false;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   requireFields,
   requireNestedFields,
-  formatMissingFieldsMessage
+  formatMissingFieldsMessage,
+  isValidUrl
 };
