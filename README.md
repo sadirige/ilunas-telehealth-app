@@ -353,6 +353,95 @@ Response
 }
 ```
 
+### Availabilities
+
+POST `/api/availabilities`
+
+Response
+```json
+{
+	"availability": {
+		"id": "<availabilityId>",
+		"doctor": "<doctorUserId>",
+		"startAt": "2026-05-30T14:00:00.000Z",
+		"endAt": "2026-05-30T18:00:00.000Z",
+		"isAvailable": true
+	}
+}
+```
+
+GET `/api/availabilities/doctor`
+
+Response
+```json
+{
+	"results": [
+		{
+			"id": "<availabilityId>",
+			"doctor": "<doctorUserId>",
+			"startAt": "2026-05-30T14:00:00.000Z",
+			"endAt": "2026-05-30T18:00:00.000Z",
+			"isAvailable": true
+		}
+	]
+}
+```
+
+GET `/api/availabilities/doctor/:doctorId?from=2026-05-30T00:00:00.000Z&to=2026-05-31T00:00:00.000Z`
+
+Notes
+
+- The date range query returns availability windows that overlap the range.
+- The match uses `endAt >= from` and `startAt <= to` when both are provided.
+- If only `from` is provided, windows ending after `from` are returned.
+- If only `to` is provided, windows starting before `to` are returned.
+
+Response
+```json
+{
+	"results": [
+		{
+			"id": "<availabilityId>",
+			"doctor": "<doctorUserId>",
+			"startAt": "2026-05-30T14:00:00.000Z",
+			"endAt": "2026-05-30T18:00:00.000Z",
+			"isAvailable": true
+		}
+	]
+}
+```
+
+Postman test snippet
+```javascript
+pm.test('Status is 200', function () {
+	pm.response.to.have.status(200);
+});
+
+pm.test('Availability results contain time windows', function () {
+	const data = pm.response.json();
+	pm.expect(data.results).to.be.an('array');
+	if (data.results.length > 0) {
+		pm.expect(data.results[0]).to.have.property('startAt');
+		pm.expect(data.results[0]).to.have.property('endAt');
+	}
+});
+```
+
+DELETE `/api/availabilities/:availabilityId`
+
+Response
+```json
+{
+	"availability": {
+		"id": "<availabilityId>",
+		"doctor": "<doctorUserId>",
+		"startAt": "2026-05-30T14:00:00.000Z",
+		"endAt": "2026-05-30T18:00:00.000Z",
+		"isAvailable": true
+	}
+}
+```
+
 ### Code Splitting
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)

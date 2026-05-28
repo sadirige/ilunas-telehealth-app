@@ -7,6 +7,7 @@ const { requireFields, formatMissingFieldsMessage } = require('../utils/validati
 const router = express.Router();
 
 const requireDoctor = [authenticate, requireRole(['doctor'])];
+const requirePatient = [authenticate, requireRole(['patient'])];
 
 const parseDate = (value) => {
   const date = new Date(value);
@@ -54,6 +55,46 @@ router.get('/doctor', requireDoctor, async (req, res, next) => {
   try {
     const availabilities = await Availability.find({ doctor: req.user.id })
       .sort({ startAt: 1 });
+
+    return res.status(200).json({
+      results: availabilities.map(buildAvailabilityResponse)
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// Patient-facing availability lookup per doctor.
+router.get('/doctor/:doctorId', requirePatient, async (req, res, next) => {
+  try {
+    const { from, to } = req.query || {};
+    const parsedFrom = from ? parseDate(from) : null;
+    const parsedTo = to ? parseDate(to) : null;
+
+    if ((from && !parsedFrom) || (to && !parsedTo)) {
+      return res.status(400).json({ message: 'Invalid date range query' });
+    }
+
+    if (parsedFrom && parsedTo && parsedTo <= parsedFrom) {
+      return res.status(400).json({ message: 'Invalid date range query' });
+    }
+
+    const availabilityFilter = {
+      doctor: req.params.doctorId,
+      isAvailable: true
+    };
+
+    if (parsedFrom) {
+      availabilityFilter.endAt = { $gte: parsedFrom };
+    }
+
+    if (parsedTo) {
+      availabilityFilter.startAt = { $lte: parsedTo };
+    }
+
+    const availabilities = await Availability.find({
+      ...availabilityFilter
+    }).sort({ startAt: 1 });
 
     return res.status(200).json({
       results: availabilities.map(buildAvailabilityResponse)
