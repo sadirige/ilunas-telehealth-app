@@ -38,8 +38,8 @@ const PatientDoctorDiscoveryPanel = ({
     <section className="panel">
       <div className="section__header">
         <div>
-          <h2>Find a doctor</h2>
-          <p>Search by name, specialty, or symptoms to book your consultation.</p>
+          <h2>Doctor Discovery</h2>
+          <p>Browse and filter all available doctors by name, specialization, or credentials.</p>
         </div>
       </div>
 

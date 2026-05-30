@@ -40,6 +40,30 @@
   background: transparent;
 }
 
+.doctor-card__match-reasoning {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 119, 182, 0.2);
+}
+
+.doctor-card__match-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.doctor-card__match-symptoms {
+  font-size: 0.85rem;
+  color: var(--ink);
+  margin: 0;
+  font-style: italic;
+}
+
 .doctor-card__info {
   display: flex;
   flex-direction: column;

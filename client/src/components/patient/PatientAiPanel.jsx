@@ -1,6 +1,27 @@
 import FormField from '../ui/FormField';
 import SlotPicker from '../ui/SlotPicker';
 
+const TAGALOG_SYMPTOMS = [
+  { tagalog: 'masakit sa dibdib', english: 'chest pain' },
+  { tagalog: 'masakit na ulo', english: 'headache' },
+  { tagalog: 'makati ang balat', english: 'skin itch' },
+  { tagalog: 'sakit ng tiyan', english: 'stomach pain' },
+  { tagalog: 'ubo', english: 'cough' },
+  { tagalog: 'lagnat', english: 'fever' },
+  { tagalog: 'pagkahilo', english: 'dizziness' },
+  { tagalog: 'hirap sa paghinga', english: 'shortness of breath' },
+  { tagalog: 'masakit na likod', english: 'back pain' },
+  { tagalog: 'masakit ng kasu-kasan', english: 'joint pain' },
+  { tagalog: 'pagkatuyo ng balat', english: 'dry skin' },
+  { tagalog: 'pangangati', english: 'itching' }
+];
+
+const getSelectedSymptoms = (query) => {
+  if (!query) return new Set();
+  const symptoms = query.toLowerCase().split(',').map(s => s.trim());
+  return new Set(symptoms);
+};
+
 const PatientAiPanel = ({
   recommendations,
   recommendationQuery,
@@ -16,8 +37,8 @@ const PatientAiPanel = ({
   <section className="panel">
     <div className="section__header">
       <div>
-        <h2>AI recommendations</h2>
-        <p>Describe your symptoms to find doctors best suited to your needs.</p>
+        <h2>AI Recommendation</h2>
+        <p>Describe your symptoms or health concerns to get AI-matched doctors based on medical specialization.</p>
       </div>
     </div>
 
@@ -40,6 +61,47 @@ const PatientAiPanel = ({
           required
         />
       </FormField>
+
+      <div className="form__field">
+        <label className="form__label">Quick symptom buttons (Tagalog)</label>
+        <p className="form__hint">Click to add common symptoms in Tagalog</p>
+        <div className="symptom-buttons">
+          {TAGALOG_SYMPTOMS.map((symptom) => {
+            const selectedSymptoms = getSelectedSymptoms(recommendationQuery);
+            const isSelected = selectedSymptoms.has(symptom.english.toLowerCase());
+
+            return (
+              <button
+                key={symptom.tagalog}
+                type="button"
+                className={`ghost symptom-button ${isSelected ? 'symptom-button--selected' : ''}`}
+                onClick={() => {
+                  const currentQuery = recommendationQuery.trim();
+                  const selectedSymptoms = getSelectedSymptoms(currentQuery);
+                  const symptomLower = symptom.english.toLowerCase();
+
+                  if (selectedSymptoms.has(symptomLower)) {
+                    // Remove the symptom
+                    const updatedSymptoms = Array.from(selectedSymptoms)
+                      .filter(s => s !== symptomLower);
+                    const newQuery = updatedSymptoms.join(', ');
+                    setRecommendationQuery(newQuery);
+                  } else {
+                    // Add the symptom
+                    const newQuery = currentQuery
+                      ? `${currentQuery}, ${symptom.english}`
+                      : symptom.english;
+                    setRecommendationQuery(newQuery);
+                  }
+                }}
+              >
+                {symptom.tagalog}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <button type="submit" className="primary">
         Get recommendations
       </button>
@@ -76,6 +138,15 @@ const PatientAiPanel = ({
                 <span className="pill pill--accent">AI match</span>
               </div>
               {doctor.bio && <p className="doctor-card__bio">{doctor.bio}</p>}
+
+              {doctor.matchedSymptoms && doctor.matchedSymptoms.length > 0 && (
+                <div className="doctor-card__match-reasoning">
+                  <p className="doctor-card__match-label">Matched symptoms:</p>
+                  <p className="doctor-card__match-symptoms">
+                    {doctor.matchedSymptoms.join(', ')}
+                  </p>
+                </div>
+              )}
 
               {availability?.status === 'ready' && availability.slots.length > 0 ? (
                 <>

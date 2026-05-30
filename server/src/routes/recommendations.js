@@ -15,14 +15,15 @@ const router = express.Router();
 
 const requirePatient = [authenticate, requireRole(['patient'])];
 
-const buildRecommendationResponse = (profile, score) => ({
+const buildRecommendationResponse = (profile, score, matchedSymptoms) => ({
   id: profile.id,
   userId: profile.user.toString(),
   name: profile.name,
   bio: profile.bio,
   specialization: profile.specialization,
   profilePictureUrl: profile.profilePictureUrl,
-  score
+  score,
+  matchedSymptoms
 });
 
 router.post('/', requirePatient, async (req, res, next) => {
@@ -37,14 +38,18 @@ router.post('/', requirePatient, async (req, res, next) => {
       return res.status(400).json({ message: 'symptoms must include meaningful keywords' });
     }
 
-    const specializationScores = buildSpecializationScores(tokens);
+    const { scores: specializationScores, matchedKeywords } = buildSpecializationScores(tokens);
     const doctorProfiles = await DoctorProfile.find({}).sort({ createdAt: -1 });
 
     const ranked = doctorProfiles
-      .map((profile) => ({
-        profile,
-        score: scoreDoctor(profile, tokens, specializationScores)
-      }))
+      .map((profile) => {
+        const result = scoreDoctor(profile, tokens, specializationScores, matchedKeywords);
+        return {
+          profile,
+          score: result.score,
+          matchedSymptoms: result.matchedSymptoms
+        };
+      })
       .sort((a, b) => b.score - a.score);
 
     const maxResults = parseLimit(limit);
@@ -55,7 +60,8 @@ router.post('/', requirePatient, async (req, res, next) => {
     const fallback = results.length === 0
       ? doctorProfiles.slice(0, maxResults).map((profile) => ({
           profile,
-          score: 0
+          score: 0,
+          matchedSymptoms: []
         }))
       : results;
 
@@ -75,7 +81,7 @@ router.post('/', requirePatient, async (req, res, next) => {
       query: symptoms,
       matchedSpecializations,
       recommendations: fallback.map((item) =>
-        buildRecommendationResponse(item.profile, item.score)
+        buildRecommendationResponse(item.profile, item.score, item.matchedSymptoms)
       )
     });
   } catch (error) {

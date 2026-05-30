@@ -65,3 +65,44 @@
 .section__header--compact {
   margin-bottom: 0;
 }
+
+/* ── Symptom buttons ── */
+
+.symptom-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.symptom-button {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--ink);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.symptom-button:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.symptom-button:active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.symptom-button--selected {
+  background: var(--surface-muted);
+  border-color: var(--border-muted);
+  color: var(--ink-muted);
+  opacity: 0.6;
+}
+
+.symptom-button--selected:hover {
+  background: var(--border);
+  border-color: var(--ink-muted);
+}
