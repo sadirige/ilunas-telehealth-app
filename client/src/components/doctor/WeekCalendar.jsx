@@ -14,11 +14,17 @@ export const CALENDAR_STEP_MINUTES = 30;
 const TOTAL_ROWS =
   ((CALENDAR_END_HOUR - CALENDAR_START_HOUR) * 60) / CALENDAR_STEP_MINUTES;
 
+const getEffectiveWidth = () => {
+  if (typeof window === 'undefined') return 1400;
+  return window.visualViewport?.width ?? window.innerWidth;
+};
+
 const getResponsiveRowHeight = () => {
-  if (typeof window === 'undefined') return 20;
-  if (window.innerWidth >= 1400) return 16;
-  if (window.innerWidth >= 1200) return 18;
-  if (window.innerWidth <= 768) return 22;
+  const width = getEffectiveWidth();
+  if (width >= 1400) return 16;
+  if (width >= 1200) return 18;
+  if (width <= 768) return 22;
+  if (width <= 980) return 18;
   return 20;
 };
 
@@ -28,7 +34,13 @@ const useCalendarRowHeight = () => {
   useEffect(() => {
     const onResize = () => setRowHeight(getResponsiveRowHeight());
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('scroll', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('scroll', onResize);
+    };
   }, []);
 
   return rowHeight;
