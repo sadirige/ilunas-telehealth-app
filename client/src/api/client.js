@@ -31,10 +31,18 @@ const apiRequest = async (path, options = {}) => {
         body: options.body ? JSON.parse(options.body) : null
     });
 
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-        ...options,
-        headers: finalHeaders
-    });
+    let response;
+    try {
+        response = await fetch(`${API_BASE_URL}${path}`, {
+            ...options,
+            headers: finalHeaders
+        });
+    } catch (error) {
+        if (error instanceof TypeError) {
+            throw new Error('Network error. Please check your internet connection and try again.');
+        }
+        throw error;
+    }
 
     const data = await response.json().catch(() => ({}));
     console.log('API Response:', { status: response.status, data });

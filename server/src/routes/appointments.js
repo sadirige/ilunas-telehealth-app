@@ -63,12 +63,12 @@ router.post('/', requirePatient, async (req, res, next) => {
 
     const parsedDate = parseScheduledAt(scheduledAt);
     if (!parsedDate) {
-      return res.status(400).json({ message: 'scheduledAt must be a valid date' });
+      return res.status(400).json({ message: 'Invalid appointment date. Please provide a valid date and time.' });
     }
 
     const doctorProfile = await DoctorProfile.findById(doctorProfileId).select('user');
     if (!doctorProfile) {
-      return res.status(404).json({ message: 'Doctor profile not found' });
+      return res.status(404).json({ message: 'Doctor profile not found. Please select a valid doctor.' });
     }
 
     const existing = await Appointment.findOne({
@@ -78,13 +78,13 @@ router.post('/', requirePatient, async (req, res, next) => {
     });
 
     if (existing) {
-      return res.status(409).json({ message: 'Doctor is not available at that time' });
+      return res.status(409).json({ message: 'This time slot is already booked. Please choose a different time.' });
     }
 
     const duration = durationMinutes || 30;
     const hasAvailability = await doctorHasAvailability(doctorProfile.user, parsedDate, duration);
     if (!hasAvailability) {
-      return res.status(409).json({ message: 'Doctor is not available at that time' });
+      return res.status(409).json({ message: 'The doctor is not available at this time. Please check their availability and select a different time.' });
     }
 
     const appointment = await Appointment.create({
@@ -156,7 +156,7 @@ router.patch('/:appointmentId/reschedule', requirePatient, async (req, res, next
 
     const parsedDate = parseScheduledAt(scheduledAt);
     if (!parsedDate) {
-      return res.status(400).json({ message: 'scheduledAt must be a valid date' });
+      return res.status(400).json({ message: 'Invalid appointment date. Please provide a valid date and time.' });
     }
 
     const appointment = await Appointment.findOne({
@@ -166,7 +166,7 @@ router.patch('/:appointmentId/reschedule', requirePatient, async (req, res, next
     });
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found or cannot be rescheduled. Only scheduled appointments can be rescheduled.' });
     }
 
     const conflict = await Appointment.findOne({
@@ -177,13 +177,13 @@ router.patch('/:appointmentId/reschedule', requirePatient, async (req, res, next
     });
 
     if (conflict) {
-      return res.status(409).json({ message: 'Doctor is not available at that time' });
+      return res.status(409).json({ message: 'This time slot is already booked. Please choose a different time.' });
     }
 
     const duration = appointment.durationMinutes || 30;
     const hasAvailability = await doctorHasAvailability(appointment.doctor, parsedDate, duration);
     if (!hasAvailability) {
-      return res.status(409).json({ message: 'Doctor is not available at that time' });
+      return res.status(409).json({ message: 'The doctor is not available at this time. Please check their availability and select a different time.' });
     }
 
     appointment.scheduledAt = parsedDate;
@@ -225,7 +225,7 @@ router.patch('/:appointmentId/cancel', requirePatient, async (req, res, next) =>
     );
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found or cannot be canceled. Only scheduled appointments can be canceled.' });
     }
 
     await createNotificationSafe({
@@ -255,7 +255,7 @@ router.patch('/:appointmentId/complete', requireDoctor, async (req, res, next) =
     );
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found or cannot be completed. Only scheduled appointments can be completed.' });
     }
 
     await createNotificationSafe({
@@ -277,7 +277,7 @@ router.patch('/:appointmentId/status', requireDoctor, async (req, res, next) => 
     const { status } = req.body || {};
 
     if (!status || !APPOINTMENT_STATUS.includes(status)) {
-      return res.status(400).json({ message: 'Invalid appointment status' });
+      return res.status(400).json({ message: `Invalid appointment status. Valid statuses are: ${APPOINTMENT_STATUS.join(', ')}.` });
     }
 
     const appointment = await Appointment.findOne({
@@ -286,11 +286,11 @@ router.patch('/:appointmentId/status', requireDoctor, async (req, res, next) => 
     });
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found. You can only update your own appointments.' });
     }
 
     if (appointment.status === 'canceled') {
-      return res.status(400).json({ message: 'Canceled appointments cannot be updated' });
+      return res.status(400).json({ message: 'Canceled appointments cannot be updated. Please schedule a new appointment instead.' });
     }
 
     appointment.status = status;
@@ -307,11 +307,11 @@ router.patch('/:appointmentId/meeting', requireDoctor, async (req, res, next) =>
     const { meetingUrl, meetingProvider, meetingHostUrl, meetingMeta } = req.body || {};
 
     if (!meetingUrl) {
-      return res.status(400).json({ message: 'meetingUrl is required' });
+      return res.status(400).json({ message: 'Meeting URL is required. Please provide a valid meeting link.' });
     }
 
     if (meetingProvider && !MEETING_PROVIDERS.includes(meetingProvider)) {
-      return res.status(400).json({ message: 'Invalid meeting provider' });
+      return res.status(400).json({ message: `Invalid meeting provider. Valid providers are: ${MEETING_PROVIDERS.join(', ')}.` });
     }
 
     const appointment = await Appointment.findOneAndUpdate(
@@ -331,7 +331,7 @@ router.patch('/:appointmentId/meeting', requireDoctor, async (req, res, next) =>
     );
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found. You can only update your own appointments.' });
     }
 
     return res.status(200).json({ appointment: buildAppointmentResponse(appointment) });
@@ -344,7 +344,7 @@ router.get('/:appointmentId/meeting', authenticate, async (req, res, next) => {
   try {
     const appointment = await Appointment.findById(req.params.appointmentId);
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found.' });
     }
 
     const isParticipant =
@@ -352,7 +352,7 @@ router.get('/:appointmentId/meeting', authenticate, async (req, res, next) => {
       appointment.doctor.toString() === req.user.id;
 
     if (!isParticipant) {
-      return res.status(403).json({ message: 'Forbidden' });
+      return res.status(403).json({ message: 'You do not have permission to access this appointment. Only the patient and doctor can view meeting details.' });
     }
 
     return res.status(200).json({

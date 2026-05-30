@@ -11,6 +11,7 @@ const DEFAULT_LIMIT = 10;
 const POLL_INTERVAL_MS = 20000;
 const MAX_RETRY_DELAY_MS = 30000;
 const BASE_RETRY_DELAY_MS = 1500;
+const MAX_RETRIES = 5;
 
 const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -79,6 +80,7 @@ const useNotifications = () => {
       eventSource.onopen = () => {
         retryCountRef.current = 0;
         setStreamStatus('connected');
+        setStatus({ type: 'idle', message: '' });
       };
 
       eventSource.onmessage = () => {
@@ -104,7 +106,21 @@ const useNotifications = () => {
           BASE_RETRY_DELAY_MS * 2 ** (retryCountRef.current - 1),
           MAX_RETRY_DELAY_MS
         );
-        setStreamStatus('reconnecting');
+
+        if (retryCountRef.current >= MAX_RETRIES) {
+          setStreamStatus('failed');
+          setStatus({
+            type: 'error',
+            message: 'Real-time notifications are unavailable. Please refresh the page to reconnect.'
+          });
+        } else {
+          setStreamStatus('reconnecting');
+          setStatus({
+            type: 'warning',
+            message: `Reconnecting to notifications... (Attempt ${retryCountRef.current}/${MAX_RETRIES})`
+          });
+        }
+
         clearRetry();
         retryTimeoutRef.current = setTimeout(connect, retryDelay);
       };

@@ -30,7 +30,7 @@ router.post('/', requireDoctor, async (req, res, next) => {
 
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment || appointment.doctor.toString() !== req.user.id) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found. You can only add notes to your own appointments.' });
     }
 
     const record = await ConsultationNote.create({
@@ -78,7 +78,7 @@ router.get('/appointment/:appointmentId', requireDoctor, async (req, res, next) 
     }
 
     if (notes[0].doctor.toString() !== req.user.id) {
-      return res.status(404).json({ message: 'Consultation notes not found' });
+      return res.status(404).json({ message: 'Consultation notes not found. You can only view notes for your own appointments.' });
     }
 
     return res.status(200).json({ results: notes.map(buildNoteResponse) });

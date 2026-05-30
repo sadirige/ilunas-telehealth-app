@@ -35,8 +35,12 @@ router.post('/', requireDoctor, async (req, res, next) => {
     const parsedStart = parseDate(startAt);
     const parsedEnd = parseDate(endAt);
 
-    if (!parsedStart || !parsedEnd || parsedEnd <= parsedStart) {
-      return res.status(400).json({ message: 'Availability window is invalid' });
+    if (!parsedStart || !parsedEnd) {
+      return res.status(400).json({ message: 'Invalid date format. Please provide valid start and end dates.' });
+    }
+
+    if (parsedEnd <= parsedStart) {
+      return res.status(400).json({ message: 'End time must be after start time. Please check your availability window.' });
     }
 
     const availability = await Availability.create({
@@ -81,11 +85,11 @@ router.get('/doctor/:doctorId', requirePatient, async (req, res, next) => {
     const parsedTo = to ? parseDate(to) : null;
 
     if ((from && !parsedFrom) || (to && !parsedTo)) {
-      return res.status(400).json({ message: 'Invalid date range query' });
+      return res.status(400).json({ message: 'Invalid date format in query parameters. Please provide valid dates.' });
     }
 
     if (parsedFrom && parsedTo && parsedTo <= parsedFrom) {
-      return res.status(400).json({ message: 'Invalid date range query' });
+      return res.status(400).json({ message: 'End date must be after start date. Please check your date range.' });
     }
 
     const availabilityFilter = {

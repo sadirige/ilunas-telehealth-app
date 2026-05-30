@@ -20,16 +20,16 @@ router.post('/register', async (req, res) => {
   const { email, password, role, displayName } = req.body || {};
 
   if (!email || !password || !role) {
-    return res.status(400).json({ message: 'Email, password, and role are required' });
+    return res.status(400).json({ message: 'Email, password, and role are required. Please provide all required fields.' });
   }
 
   if (!USER_ROLES.includes(role)) {
-    return res.status(400).json({ message: 'Invalid role' });
+    return res.status(400).json({ message: `Invalid role. Valid roles are: ${USER_ROLES.join(', ')}.` });
   }
 
   const existingUser = await User.findOne({ email: email.toLowerCase() });
   if (existingUser) {
-    return res.status(409).json({ message: 'Email already registered' });
+    return res.status(409).json({ message: 'This email is already registered. Please use a different email or log in.' });
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -57,17 +57,17 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body || {};
 
   if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
+    return res.status(400).json({ message: 'Email and password are required. Please provide both fields.' });
   }
 
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({ message: 'No account found with this email. Please check your email or register.' });
   }
 
   const passwordMatches = await bcrypt.compare(password, user.passwordHash);
   if (!passwordMatches) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({ message: 'Incorrect password. Please try again or reset your password if needed.' });
   }
 
   const token = createToken(user);

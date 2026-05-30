@@ -95,7 +95,7 @@ router.patch('/:notificationId/read', authenticate, async (req, res, next) => {
     );
 
     if (!notification) {
-      return res.status(404).json({ message: 'Notification not found' });
+      return res.status(404).json({ message: 'Notification not found. You can only mark your own notifications as read.' });
     }
 
     return res.status(200).json({ notification: buildNotificationResponse(notification) });

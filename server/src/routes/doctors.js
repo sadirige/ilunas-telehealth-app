@@ -40,7 +40,7 @@ router.post('/profile', requireDoctor, async (req, res, next) => {
 
     const existingProfile = await DoctorProfile.findOne({ user: req.user.id });
     if (existingProfile) {
-      return res.status(409).json({ message: 'Profile already exists' });
+      return res.status(409).json({ message: 'Profile already exists. Please update your existing profile instead of creating a new one.' });
     }
 
     const profile = await DoctorProfile.create({
@@ -63,7 +63,7 @@ router.get('/profile/me', requireDoctor, async (req, res, next) => {
   try {
     const profile = await DoctorProfile.findOne({ user: req.user.id });
     if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+      return res.status(404).json({ message: 'Profile not found. Please create your profile first.' });
     }
 
     return res.status(200).json({ profile });
@@ -83,7 +83,7 @@ router.patch('/profile/me', requireDoctor, async (req, res, next) => {
     );
 
     if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+      return res.status(404).json({ message: 'Profile not found. Please create your profile first.' });
     }
 
     return res.status(200).json({ profile });
@@ -107,7 +107,7 @@ router.patch('/profile/me/picture', requireDoctor, async (req, res, next) => {
     );
 
     if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+      return res.status(404).json({ message: 'Profile not found. Please create your profile first.' });
     }
 
     return res.status(200).json({ profile });
@@ -148,7 +148,7 @@ router.get('/:doctorId', requirePatient, async (req, res, next) => {
     );
 
     if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+      return res.status(404).json({ message: 'Doctor profile not found. Please check the doctor ID.' });
     }
 
     return res.status(200).json({ profile: buildDoctorProfileResponse(profile) });

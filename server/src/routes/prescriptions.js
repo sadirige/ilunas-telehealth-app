@@ -30,12 +30,12 @@ router.post('/', requireDoctor, async (req, res, next) => {
     }
 
     if (!Array.isArray(medications) || medications.length === 0) {
-      return res.status(400).json({ message: 'At least one medication is required' });
+      return res.status(400).json({ message: 'At least one medication is required. Please add medication details.' });
     }
 
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment || appointment.doctor.toString() !== req.user.id) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: 'Appointment not found. You can only prescribe medications for your own appointments.' });
     }
 
     const prescription = await Prescription.create({
@@ -84,7 +84,7 @@ router.get('/appointment/:appointmentId', requireDoctor, async (req, res, next) 
     }
 
     if (prescriptions[0].doctor.toString() !== req.user.id) {
-      return res.status(404).json({ message: 'Prescriptions not found' });
+      return res.status(404).json({ message: 'Prescriptions not found. You can only view prescriptions for your own appointments.' });
     }
 
     return res.status(200).json({ results: prescriptions.map(buildPrescriptionResponse) });
