@@ -410,3 +410,143 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* ── Responsive calendar adjustments ── */
+
+@media (max-width: 980px) {
+  .week-calendar__scroll {
+    min-width: 100%;
+    overflow-x: auto;
+  }
+
+  .week-calendar__header,
+  .week-calendar__body {
+    grid-template-columns: 48px repeat(7, minmax(70px, 1fr));
+  }
+
+  .week-calendar__columns {
+    grid-template-columns: repeat(7, minmax(70px, 1fr));
+  }
+
+  .week-calendar__day-header {
+    padding: 6px 4px;
+  }
+
+  .week-calendar__date {
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  }
+
+  .week-calendar__time-label {
+    font-size: 0.68rem;
+    padding: 0 6px;
+  }
+
+  .week-calendar__block {
+    font-size: 0.62rem;
+    padding: 1px 3px;
+  }
+
+  .week-calendar__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .week-calendar__nav {
+    justify-content: space-between;
+  }
+
+  .week-calendar__range {
+    min-width: auto;
+    flex: 1;
+    text-align: center;
+  }
+
+  .availability-calendar-primary__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .duration-presets--toolbar {
+    justify-content: center;
+  }
+
+  .week-calendar__action-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .week-calendar__action-buttons {
+    justify-content: stretch;
+  }
+
+  .week-calendar__action-buttons .primary,
+  .week-calendar__action-buttons .ghost {
+    flex: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .week-calendar__header,
+  .week-calendar__body {
+    grid-template-columns: 40px repeat(7, minmax(50px, 1fr));
+  }
+
+  .week-calendar__columns {
+    grid-template-columns: repeat(7, minmax(50px, 1fr));
+  }
+
+  .week-calendar__day-header {
+    padding: 4px 2px;
+  }
+
+  .week-calendar__weekday {
+    font-size: 0.65rem;
+  }
+
+  .week-calendar__date {
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+
+  .week-calendar__time-label {
+    font-size: 0.6rem;
+    padding: 0 4px;
+  }
+
+  .week-calendar__block {
+    font-size: 0.55rem;
+    padding: 1px 2px;
+    left: 2px;
+    right: 2px;
+  }
+
+  .week-calendar__selection {
+    left: 2px;
+    right: 2px;
+  }
+
+  .week-calendar__toolbar {
+    gap: 8px;
+  }
+
+  .week-calendar__nav button {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  .week-calendar__range {
+    font-size: 0.9rem;
+  }
+
+  .availability-calendar-primary {
+    padding: 8px 8px 12px;
+  }
+
+  .availability-calendar-primary__toolbar {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+  }
+}
