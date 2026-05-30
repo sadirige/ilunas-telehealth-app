@@ -18,8 +18,35 @@
   border-bottom: 1px solid var(--border);
 }
 
+.sidebar__user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.sidebar__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+
+.sidebar__avatar--placeholder {
+  background: var(--surface-muted);
+  color: var(--ink-soft);
+}
+
 .sidebar__user {
-  margin-top: 8px;
+  margin-top: 0;
   font-size: 0.85rem;
   color: var(--ink-soft);
   overflow: hidden;

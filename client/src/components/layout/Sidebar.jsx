@@ -3,6 +3,7 @@ import BrandLogo from '../ui/BrandLogo';
 const Sidebar = ({
   roleLabel,
   userName,
+  profilePictureUrl,
   navItems,
   activeSection,
   onNavigate,
@@ -13,7 +14,20 @@ const Sidebar = ({
   <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`} aria-label="Main navigation">
     <div className="sidebar__header">
       <BrandLogo subtitle={roleLabel} />
-      {userName && <p className="sidebar__user">{userName}</p>}
+      <div className="sidebar__user-info">
+        {profilePictureUrl ? (
+          <img
+            src={profilePictureUrl}
+            alt={`${userName}'s profile`}
+            className="sidebar__avatar"
+          />
+        ) : (
+          <div className="sidebar__avatar sidebar__avatar--placeholder">
+            {userName?.charAt(0)?.toUpperCase() || '?'}
+          </div>
+        )}
+        {userName && <p className="sidebar__user">{userName}</p>}
+      </div>
       <button
         type="button"
         className="sidebar__close ghost ghost--compact"

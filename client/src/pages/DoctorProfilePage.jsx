@@ -228,6 +228,7 @@ const DoctorProfilePage = ({ onLogout }) => {
     <AppShell
       roleLabel="Doctor"
       userName={storedUser?.displayName || profile.form.name}
+      profilePictureUrl={profile.previewUrl}
       navItems={doctorNav}
       activeSection={activeSection}
       onNavigate={handleNavigate}

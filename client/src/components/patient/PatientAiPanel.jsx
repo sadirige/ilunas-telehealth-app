@@ -58,9 +58,17 @@ const PatientAiPanel = ({
           return (
             <article key={doctor.id} className="card doctor-card">
               <div className="doctor-card__header">
-                <div className="doctor-card__avatar" aria-hidden="true">
-                  {doctor.name?.charAt(0) || 'D'}
-                </div>
+                {doctor.profilePictureUrl ? (
+                  <img
+                    src={doctor.profilePictureUrl}
+                    alt={`${doctor.name}'s profile`}
+                    className="doctor-card__avatar doctor-card__avatar--image"
+                  />
+                ) : (
+                  <div className="doctor-card__avatar" aria-hidden="true">
+                    {doctor.name?.charAt(0) || 'D'}
+                  </div>
+                )}
                 <div className="doctor-card__info">
                   <h3>{doctor.name}</h3>
                   <p className="doctor-card__specialization">{doctor.specialization}</p>

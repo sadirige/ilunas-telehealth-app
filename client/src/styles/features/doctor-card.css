@@ -35,6 +35,11 @@
   flex-shrink: 0;
 }
 
+.doctor-card__avatar--image {
+  object-fit: cover;
+  background: transparent;
+}
+
 .doctor-card__info {
   display: flex;
   flex-direction: column;

@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 const AppShell = ({
   roleLabel,
   userName,
+  profilePictureUrl,
   navItems,
   activeSection,
   onNavigate,
@@ -34,6 +35,7 @@ const AppShell = ({
       <Sidebar
         roleLabel={roleLabel}
         userName={userName}
+        profilePictureUrl={profilePictureUrl}
         navItems={navItems}
         activeSection={activeSection}
         onNavigate={handleNavigate}
