@@ -1,3 +1,5 @@
+import EmptyState from '../ui/EmptyState';
+
 const PatientRecordsPanel = ({
   records,
   notes,
@@ -9,7 +11,8 @@ const PatientRecordsPanel = ({
   noteLoading,
   prescriptionLoading,
   onExportRecords,
-  onExportPrescriptions
+  onExportPrescriptions,
+  onNavigateToDoctors
 }) => (
   <>
     <section className="panel">
@@ -39,7 +42,17 @@ const PatientRecordsPanel = ({
       {recordLoading ? (
         <p className="hint">Loading medical records...</p>
       ) : records.length === 0 ? (
-        <p className="hint">No medical records yet.</p>
+        <EmptyState
+          title="No medical records yet"
+          description="Records will appear here after your consultations."
+          action={
+            onNavigateToDoctors ? (
+              <button type="button" className="primary" onClick={onNavigateToDoctors}>
+                Book a consultation
+              </button>
+            ) : null
+          }
+        />
       ) : (
         <div className="records__list">
           {records.map((record) => (
@@ -78,7 +91,17 @@ const PatientRecordsPanel = ({
       {noteLoading ? (
         <p className="hint">Loading consultation notes...</p>
       ) : notes.length === 0 ? (
-        <p className="hint">No consultation notes yet.</p>
+        <EmptyState
+          title="No consultation notes yet"
+          description="Notes shared by your clinician will appear here after visits."
+          action={
+            onNavigateToDoctors ? (
+              <button type="button" className="primary" onClick={onNavigateToDoctors}>
+                Book a consultation
+              </button>
+            ) : null
+          }
+        />
       ) : (
         <div className="records__list">
           {notes.map((note) => (
@@ -124,7 +147,17 @@ const PatientRecordsPanel = ({
       {prescriptionLoading ? (
         <p className="hint">Loading prescriptions...</p>
       ) : prescriptions.length === 0 ? (
-        <p className="hint">No prescriptions yet.</p>
+        <EmptyState
+          title="No prescriptions yet"
+          description="Medication instructions provided by your doctor will appear here after consultations."
+          action={
+            onNavigateToDoctors ? (
+              <button type="button" className="primary" onClick={onNavigateToDoctors}>
+                Book a consultation
+              </button>
+            ) : null
+          }
+        />
       ) : (
         <div className="records__list">
           {prescriptions.map((prescription) => (

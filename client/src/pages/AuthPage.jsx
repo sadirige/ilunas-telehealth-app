@@ -1,6 +1,5 @@
 import useAuthForm from '../hooks/useAuthForm';
 import BrandLogo from '../components/ui/BrandLogo';
-import '../App.css';
 
 const AuthPage = ({ onAuthSuccess }) => {
   const {

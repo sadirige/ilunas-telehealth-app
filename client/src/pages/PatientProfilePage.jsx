@@ -20,7 +20,6 @@ import usePatientProfileForm from '../hooks/usePatientProfileForm';
 import { usePrescriptions } from '../hooks/usePrescriptions';
 import useRecommendations from '../hooks/useRecommendations';
 import { downloadPdf } from '../utils/export';
-import '../App.css';
 
 const PATIENT_SECTIONS = {
   overview: { title: 'Overview', subtitle: 'Quick snapshot of your care activity.' },
@@ -336,6 +335,7 @@ const PatientProfilePage = ({ onLogout }) => {
           prescriptionLoading={prescriptionsHook.loading}
           onExportRecords={handleExportRecords}
           onExportPrescriptions={handleExportPrescriptions}
+          onNavigateToDoctors={() => handleNavigate('doctors')}
         />
       )}
 

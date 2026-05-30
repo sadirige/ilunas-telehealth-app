@@ -20,7 +20,6 @@ import useMedicalRecords from '../hooks/useMedicalRecords';
 import useNotifications from '../hooks/useNotifications';
 import { usePrescriptions } from '../hooks/usePrescriptions';
 import { downloadPdf } from '../utils/export';
-import '../App.css';
 
 const DOCTOR_SECTIONS = {
   overview: { title: 'Overview', subtitle: 'Quick snapshot of your clinic activity.' },
@@ -348,6 +347,7 @@ const DoctorProfilePage = ({ onLogout }) => {
           onSendLink={setSendLinkAppointment}
           onOpenMeetingGuide={setMeetingGuideProvider}
           onSaveMeeting={appointmentsHook.handleSaveMeeting}
+          onNavigateToAvailability={() => handleNavigate('availability')}
         />
       )}
 
@@ -377,6 +377,7 @@ const DoctorProfilePage = ({ onLogout }) => {
           handlePrescriptionSubmit={prescriptionsHook.handleSubmit}
           onExportRecords={handleExportRecords}
           onExportPrescriptions={handleExportPrescriptions}
+          onNavigateToAppointments={() => handleNavigate('appointments')}
         />
       )}
 

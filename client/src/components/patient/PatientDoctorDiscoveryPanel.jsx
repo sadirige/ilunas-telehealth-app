@@ -79,6 +79,19 @@ const PatientDoctorDiscoveryPanel = ({
         <EmptyState
           title="No doctors found"
           description="Try adjusting your search terms or choose a different specialization."
+          action={
+            <button
+              type="button"
+              className="primary"
+              onClick={() => {
+                setDoctorQuery('');
+                setSpecializationQuery('');
+                handleDoctorSearch({ preventDefault: () => {} });
+              }}
+            >
+              Clear filters
+            </button>
+          }
         />
       ) : doctorStatus.type === 'loading' ? (
         <div className="cards">

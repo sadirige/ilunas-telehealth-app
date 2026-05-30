@@ -28,7 +28,8 @@ const DoctorAppointmentsPanel = ({
   onStartSession,
   onSendLink,
   onOpenMeetingGuide,
-  onSaveMeeting
+  onSaveMeeting,
+  onNavigateToAvailability
 }) => (
   <section className="panel">
     <div className="section__header">
@@ -89,6 +90,13 @@ const DoctorAppointmentsPanel = ({
       <EmptyState
         title="No appointments yet"
         description="Appointments will appear here once patients book with you."
+        action={
+          onNavigateToAvailability ? (
+            <button type="button" className="primary" onClick={onNavigateToAvailability}>
+              Set availability
+            </button>
+          ) : null
+        }
       />
     ) : (
       <div className="appointment__list">
