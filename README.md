@@ -47,7 +47,7 @@ This application follows a clean three-tier architecture:
 ## Project Structure
 
 ```
-ilunas/
+ilunas-telehealth-app/
 ├── client/              # React frontend application
 │   ├── src/
 │   │   ├── api/        # API client and endpoint functions
@@ -63,6 +63,7 @@ ilunas/
 │   │   ├── middleware/ # Custom middleware
 │   │   ├── models/     # Mongoose schemas
 │   │   ├── routes/     # API route handlers
+│   │   ├── scripts/    # Demo seed script
 │   │   └── utils/      # Utility functions
 │   └── README.md       # Server documentation
 ├── .gitignore          # Git ignore rules
@@ -82,7 +83,7 @@ ilunas/
 1. **Clone the repository**
 ```bash
 git clone <repository-url>
-cd ilunas
+cd ilunas-telehealth-app
 ```
 
 2. **Install server dependencies**
@@ -102,9 +103,10 @@ npm install
 Create `.env` file in `server/`:
 ```
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/ilunas
+MONGO_URI=mongodb://localhost:27017/ilunas
 JWT_SECRET=your_jwt_secret_here
 NODE_ENV=development
+CLIENT_ORIGIN=http://localhost:5173
 ```
 
 Create `.env` file in `client/`:
@@ -120,13 +122,19 @@ mongod
 # Or use MongoDB Atlas connection string in server/.env
 ```
 
-6. **Start the server**
+6. **Seed demo data (recommended for reviewers)**
+```bash
+cd server
+npm run seed
+```
+
+7. **Start the server**
 ```bash
 cd server
 npm start
 ```
 
-7. **Start the client**
+8. **Start the client**
 ```bash
 cd client
 npm run dev
@@ -135,6 +143,19 @@ npm run dev
 The application will be available at:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5000/api
+
+## Demo Accounts
+
+After seeding, use these credentials to explore both roles:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Patient | `patient.demo@ilunas.test` | `Demo1234!` |
+| Doctor (Cardiology) | `doctor.cardio@ilunas.test` | `Demo1234!` |
+| Doctor (Dermatology) | `doctor.derm@ilunas.test` | `Demo1234!` |
+| Doctor (Pediatrics) | `doctor.pedia@ilunas.test` | `Demo1234!` |
+
+To reset demo data: `npm run seed:fresh` in the `server/` directory.
 
 ## Documentation
 
@@ -148,7 +169,7 @@ For detailed documentation on each part of the application, refer to:
 ### Patient Module
 - **Account Creation**: Secure registration with email/password authentication
 - **Doctor Discovery**: Browse and filter doctors by specialization
-- **AI Recommendation**: Symptom-based doctor matching with Tagalog support
+- **AI Recommendation**: Symptom-based doctor matching (keyword engine; Tagalog quick-pick chips in UI)
 - **Appointment Booking**: Schedule, reschedule, and cancel consultations
 - **Consultation Sessions**: Join video calls via integrated providers
 - **Medical Records**: View appointment history, notes, and prescriptions
@@ -219,7 +240,7 @@ The server can be deployed on:
 - **TypeScript**: Type safety across the codebase
 - **State Management**: Redux/Zustand for complex state
 - **Email Notifications**: Nodemailer for appointment reminders
-- **File Upload**: Cloudinary integration for profile pictures
+- **File Upload**: Cloudinary integration for profile pictures (client-side URL storage)
 - **HIPAA Compliance**: Encryption, audit logs, access controls
 
 ## Obsolete Files

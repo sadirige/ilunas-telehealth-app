@@ -1,156 +1,110 @@
 # Telehealth Client Application
 
-This is the React frontend for the telehealth web application. Built with React, Vite, and modern JavaScript, it provides a responsive, accessible interface for patients and doctors to manage consultations, schedules, and medical records.
+React frontend for the telehealth web application. Built with React 19, Vite, and plain CSS, it provides a responsive interface for patients and doctors to manage consultations, schedules, and medical records.
 
 ## Tech Stack
 
-- **React 19** - UI library with component-based architecture
-- **Vite** - Build tool for fast development and optimized production builds
-- **CSS Variables** - For consistent theming and design system
-- **Fetch API** - For HTTP requests to backend
+- **React 19** — component-based UI
+- **Vite 8** — dev server and production builds
+- **react-router-dom 7** — client-side routing
+- **CSS variables** — theming and layout
+- **Fetch API** — REST calls via `src/api/client.js`
 
 ## Project Structure
 
 ```
 client/
-├── public/              # Static assets (favicon, icons)
+├── public/                 # Static assets (favicon, icons)
 ├── src/
-│   ├── api/            # API client and endpoint functions
-│   ├── assets/         # Images and other static resources
-│   ├── components/     # Reusable UI components
-│   │   ├── doctor/    # Doctor-specific components
-│   │   ├── layout/    # Layout components (Sidebar, etc.)
-│   │   ├── patient/   # Patient-specific components
-│   │   ├── shared/    # Shared components between roles
-│   │   └── ui/        # Generic UI components (buttons, forms, etc.)
-│   ├── hooks/          # Custom React hooks
-│   ├── pages/          # Page-level components
-│   ├── styles/         # CSS stylesheets organized by feature
-│   ├── utils/          # Utility functions
-│   ├── App.jsx         # Main application component
-│   ├── index.css       # Global styles
-│   └── main.jsx        # Application entry point
-├── .env                # Environment variables
-├── .gitignore          # Git ignore rules
-├── eslint.config.js    # ESLint configuration
-├── index.html          # HTML template
-├── package.json        # Dependencies and scripts
-├── vite.config.js      # Vite configuration
-└── README.md           # This file
+│   ├── api/               # API client (`client.js`)
+│   ├── components/
+│   │   ├── doctor/        # Doctor dashboard panels and calendar
+│   │   ├── layout/        # AppShell, Sidebar
+│   │   ├── patient/       # Patient dashboard panels
+│   │   ├── shared/        # NotificationsPanel
+│   │   └── ui/            # Reusable UI (FormField, SlotPicker, etc.)
+│   ├── hooks/             # Custom React hooks (see below)
+│   ├── pages/             # AuthPage, PatientDashboardPage, DoctorDashboardPage
+│   ├── styles/            # CSS organized by base, components, features, utilities
+│   ├── utils/             # datetime, export, avatarColors, availabilityTemplates
+│   ├── App.jsx            # Auth gate and role-based route trees
+│   └── main.jsx           # Entry point
+├── .env                   # VITE_API_BASE_URL
+└── package.json
 ```
 
-## Folder Structure Rationale
+## Routing and Authentication
 
-### `src/api/`
-Contains the API client (`client.js`) that handles all HTTP requests to the backend. This centralizes request logic, including JWT authentication headers, error handling, and network error detection. Having a single API client ensures consistent request/response handling across the application.
+There is no separate `/login` route. Authentication is handled at the app root:
 
-### `src/components/`
-Components are organized by role and purpose:
-- **`doctor/`**: Components specific to doctor workflows (availability management, appointment management)
-- **`patient/`**: Components specific to patient workflows (doctor discovery, AI recommendations, appointment booking)
-- **`layout/`**: Layout components that structure the application (Sidebar)
-- **`shared/`**: Components used by both patient and doctor roles
-- **`ui/`**: Generic, reusable UI components (FormField, SlotPicker, EmptyState, etc.)
+- **Unauthenticated users** see `AuthPage` on all paths.
+- **Patients** use `/patient/:section` (e.g. `/patient/doctors`, `/patient/appointments`).
+- **Doctors** use `/doctor/:section` (e.g. `/doctor/availability`, `/doctor/clinical`).
 
-This organization makes the codebase maintainable by grouping related functionality and making it easy to find components by their purpose.
+Auth state lives in `App.jsx` (not React Context):
 
-### `src/hooks/`
-Custom React hooks that encapsulate reusable stateful logic:
-- `useAuth` - Authentication state and logout
-- `useNotifications` - Real-time notification handling with SSE
-- `useAppointments` - Appointment data fetching and management
-- `useDoctors` - Doctor data fetching
-- `useAvailabilities` - Availability data fetching
-- `usePrescriptions` - Prescription data fetching
-- `useNotes` - Consultation notes data fetching
+- JWT stored in `localStorage` as `authToken`
+- User object stored as `authUser`
+- `useAuthForm.js` handles register/login and session persistence
+- New users are redirected to the profile section until onboarding is complete
 
-Hooks follow the single responsibility principle and keep component logic clean and reusable.
+### Patient sections
 
-### `src/pages/`
-Page-level components that represent major application routes:
-- `AuthPage` - Registration and login
-- `PatientDashboardPage` - Patient main dashboard
-- `DoctorDashboardPage` - Doctor main dashboard
+`overview`, `notifications`, `profile`, `doctors`, `ai`, `appointments`, `records`
 
-Pages orchestrate components and manage page-level state.
+### Doctor sections
 
-### `src/styles/`
-CSS stylesheets organized by feature:
-- **`base/`** - Base styles (reset, typography, sidebar)
-- **`components/`** - Component-specific styles (panels, forms)
-- **`features/`** - Feature-specific styles (doctor-card, slot-picker)
-- **`pages/`** - Page-specific styles
+`overview`, `today`, `notifications`, `profile`, `availability`, `appointments`, `clinical`
 
-This organization mirrors the component structure, making it easy to locate styles for specific features.
+## Custom Hooks
 
-### `src/utils/`
-Utility functions that are not React-specific:
-- `avatarColors.js` - Generates consistent colors for profile picture placeholders
-- `dateUtils.js` - Date formatting and manipulation
-- `validation.js` - Form validation helpers
+| Hook | Purpose |
+|------|---------|
+| `useAuthForm` | Register, login, password validation, session storage |
+| `usePatientProfileForm` | Patient profile create/update and picture upload |
+| `useDoctorProfileForm` | Doctor profile create/update |
+| `useDoctorDiscovery` | Browse, search, and filter doctors; load availability |
+| `useRecommendations` | AI symptom-based doctor recommendations |
+| `useAppointmentBooking` | Book, reschedule, cancel, fetch meeting links |
+| `useDoctorAvailability` | Calendar availability CRUD |
+| `useAvailabilityTemplates` | Recurring weekly schedule templates |
+| `useDoctorAppointments` | Doctor appointment list and status updates |
+| `useNotifications` | SSE stream + polling fallback, unread count |
+| `useMedicalRecords` | View/create medical record summaries |
+| `useConsultationNotes` | View/create consultation notes |
+| `usePrescriptions` | View/create prescriptions |
+| `useMeetingLinkGenerator` | Client-side Jitsi URL generation |
+| `useModal` | Generic modal open/close state |
 
-## Key Features Implementation
+## Key Features
 
-### Authentication
-Authentication is handled by the `useAuth` hook, which:
-- Stores JWT token in localStorage
-- Provides login/logout functions
-- Manages user state (user data, role)
-- Redirects unauthenticated users to login page
+### Real-time notifications
 
-The `api/client.js` automatically includes the JWT token in the Authorization header for all requests.
+`useNotifications.js` connects to `GET /api/notifications/stream` (SSE) with a 20-second polling fallback. Unread counts appear on sidebar nav items.
 
-### Real-Time Notifications
-Real-time notifications are implemented using Server-Sent Events (SSE) via the `useNotifications` hook:
-- Establishes SSE connection to `/api/notifications/stream`
-- Handles connection failures with exponential backoff retry logic
-- Maintains notification state and unread count
-- Provides status messages for reconnection attempts
-- Automatically cleans up connections on unmount
+### AI recommendation
 
-SSE was chosen over WebSockets for simplicity and because we only need one-way server-to-client communication.
+Patients describe symptoms in `PatientAiPanel.jsx`. The backend returns ranked doctors using a keyword-based specialization matcher. The UI includes quick symptom chips (including common Tagalog terms) for faster input.
 
-### AI Recommendation
-The AI recommendation feature allows patients to describe symptoms and get matched with appropriate doctors:
-- Symptom input with Tagalog symptom buttons for accessibility
-- Backend processes symptoms and returns ranked doctor recommendations
-- Displays matched symptoms as reasoning for each recommendation
-- Toggleable Tagalog buttons that gray out when selected
+### Doctor discovery and booking
 
-The frontend handles user input, displays results, and manages appointment booking from recommendations.
+Patients search by name or specialization, view availability via `SlotPicker`, and book through `PatientBookingConfirmModal`.
 
-### Doctor Discovery
-Doctor discovery allows patients to browse and filter doctors:
-- Search by name, symptoms, or specialization
-- Filter by medical specialization
-- View doctor profiles, availability, and consultation fees
-- Book appointments directly from search results
+### Availability calendar
 
-### Appointment Booking
-Appointment booking workflow:
-- View doctor availability via SlotPicker component
-- Select time slot
-- Confirm booking
-- Receive real-time notifications for booking confirmation
-- Reschedule or cancel appointments
+Doctors manage schedules with `WeekCalendar` (drag-to-select), recurring templates, and manual datetime entry. The calendar scrolls inside its panel at narrow widths and browser zoom levels so it does not overflow sibling content.
 
-### Availability Management
-Doctors manage availability through:
-- WeekCalendar component for visual schedule management
-- Availability templates for recurring schedules
-- Manual time slot entry
-- Real-time notifications for booking updates
+### Consultation sessions
 
-### Profile Picture Placeholders
-Profile picture placeholders use Gmail-style colored circles:
-- `getAvatarColor()` utility generates consistent colors based on username
-- 16 predefined colors for variety
-- First letter of name displayed in uppercase
-- White text for contrast on colored backgrounds
+Video is handled via third-party links (Jitsi, Google Meet, Zoom). Doctors set meeting URLs; patients join in a new browser tab.
+
+### Medical records
+
+Patients read records, notes, and prescriptions in `PatientRecordsPanel`. Doctors write clinical data in `DoctorClinicalPanel` after appointments.
 
 ## Environment Variables
 
-Create a `.env` file in the client directory:
+Create `client/.env`:
 
 ```
 VITE_API_BASE_URL=http://localhost:5000/api
@@ -158,60 +112,34 @@ VITE_API_BASE_URL=http://localhost:5000/api
 
 ## Development
 
-Install dependencies:
 ```bash
 npm install
-```
-
-Start development server:
-```bash
-npm run dev
-```
-
-Build for production:
-```bash
+npm run dev      # http://localhost:5173
 npm run build
-```
-
-Preview production build:
-```bash
 npm run preview
 ```
 
-## Deployment
+## Demo Accounts
 
-The client is designed to be deployed on Vercel for:
-- Automatic HTTPS
-- Global CDN
-- Preview deployments
-- Fast builds with Vite
+After running the server seed script (`npm run seed` in `server/`), log in with:
 
-## Design Principles
+| Role | Email | Password |
+|------|-------|----------|
+| Patient | `patient.demo@ilunas.test` | `Demo1234!` |
+| Doctor (Cardiology) | `doctor.cardio@ilunas.test` | `Demo1234!` |
+| Doctor (Dermatology) | `doctor.derm@ilunas.test` | `Demo1234!` |
+| Doctor (Pediatrics) | `doctor.pedia@ilunas.test` | `Demo1234!` |
 
-### Healthcare UX
-- Trustworthy design with clear error messages
-- Accessible with WCAG AA color contrast
-- Semantic HTML and ARIA labels
-- Keyboard navigation support
-- Mobile-responsive design
+## Design Notes
 
-### State Management
-- Local component state for UI-specific state
-- React Context for cross-component state (authentication)
-- Custom hooks for reusable stateful logic
-- API client for server state management
-
-### Code Organization
-- Component-based architecture for reusability
-- Clear separation of concerns (UI, logic, data)
-- Meaningful naming conventions
-- Consistent file structure
+- Healthcare-focused UX: emergency disclaimer for patients, clear appointment statuses, accessible forms
+- Responsive layout with collapsible sidebar below 980px
+- Local component state + custom hooks; no global state library
+- CSS organized to mirror feature areas (`styles/features/`, `styles/components/`)
 
 ## Future Enhancements
 
-- TypeScript for type safety
-- State management library (Redux/Zustand) for complex state
-- End-to-end testing with Playwright
-- Service workers for offline support
-- Push notifications for mobile users
-- Internationalization (i18n) for multi-language support
+- React Context or auth provider for cleaner session management
+- Embedded video SDK (Jitsi React SDK, Daily.co)
+- Token refresh and global 401 handling
+- TypeScript, E2E tests, PWA push notifications
