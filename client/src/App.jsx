@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
-import PatientProfilePage from './pages/PatientProfilePage';
-import DoctorProfilePage from './pages/DoctorProfilePage';
+import PatientProfilePage from './pages/PatientDashboardPage';
+import DoctorProfilePage from './pages/DoctorDashboardPage';
 
 const getStoredUser = () => {
 	try {
