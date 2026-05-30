@@ -1,5 +1,6 @@
 import EmptyState from '../ui/EmptyState';
 import StatusBadge from '../ui/StatusBadge';
+import SkeletonLoader from '../ui/SkeletonLoader';
 
 const DoctorAppointmentsPanel = ({
   filteredAppointments,
@@ -83,7 +84,7 @@ const DoctorAppointmentsPanel = ({
     )}
 
     {appointmentLoading ? (
-      <p className="hint">Loading appointments...</p>
+      <SkeletonLoader variant="list-item" count={3} />
     ) : filteredAppointments.length === 0 ? (
       <EmptyState
         title="No appointments yet"

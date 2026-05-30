@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import NotificationsPanel from '../components/shared/NotificationsPanel';
 import PatientAiPanel from '../components/patient/PatientAiPanel';
@@ -48,6 +49,9 @@ const buildReminderLabel = (appointment) => {
 };
 
 const PatientProfilePage = ({ onLogout }) => {
+  const { section } = useParams();
+  const navigate = useNavigate();
+
   const storedUser = useMemo(() => {
     try {
       const raw = localStorage.getItem('authUser');
@@ -68,7 +72,18 @@ const PatientProfilePage = ({ onLogout }) => {
 
   const [appointmentStatusFilter, setAppointmentStatusFilter] = useState('all');
   const [appointmentTimeFilter, setAppointmentTimeFilter] = useState('upcoming');
-  const [activeSection, setActiveSection] = useState('overview');
+  const [activeSection, setActiveSection] = useState(section || 'overview');
+
+  useEffect(() => {
+    if (section && section !== activeSection) {
+      setActiveSection(section);
+    }
+  }, [section, activeSection]);
+
+  const handleNavigate = (sectionId) => {
+    setActiveSection(sectionId);
+    navigate(`/patient/${sectionId}`);
+  };
 
   const patientNav = useMemo(
     () => [
@@ -185,7 +200,7 @@ const PatientProfilePage = ({ onLogout }) => {
       userName={storedUser?.displayName || profile.form.name}
       navItems={patientNav}
       activeSection={activeSection}
-      onNavigate={setActiveSection}
+      onNavigate={handleNavigate}
       onLogout={onLogout}
       title={sectionMeta.title}
       subtitle={sectionMeta.subtitle}
@@ -263,7 +278,7 @@ const PatientProfilePage = ({ onLogout }) => {
           onRescheduleChange={booking.handleRescheduleChange}
           onRescheduleSubmit={booking.handleRescheduleSubmit}
           onCancelReschedule={booking.handleCancelReschedule}
-          onNavigateToDoctors={() => setActiveSection('doctors')}
+          onNavigateToDoctors={() => handleNavigate('doctors')}
         />
       )}
 

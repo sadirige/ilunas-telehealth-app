@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import DoctorAppointmentsPanel from '../components/doctor/DoctorAppointmentsPanel';
 import DoctorAvailabilityPanel from '../components/doctor/DoctorAvailabilityPanel';
@@ -49,6 +50,9 @@ const buildReminderLabel = (appointment) => {
 };
 
 const DoctorProfilePage = ({ onLogout }) => {
+  const { section } = useParams();
+  const navigate = useNavigate();
+
   const storedUser = useMemo(() => {
     try {
       const raw = localStorage.getItem('authUser');
@@ -72,7 +76,18 @@ const DoctorProfilePage = ({ onLogout }) => {
   const [sessionStatus, setSessionStatus] = useState({ type: 'idle', message: '' });
   const [appointmentStatusFilter, setAppointmentStatusFilter] = useState('all');
   const [appointmentTimeFilter, setAppointmentTimeFilter] = useState('all');
-  const [activeSection, setActiveSection] = useState('overview');
+  const [activeSection, setActiveSection] = useState(section || 'overview');
+
+  useEffect(() => {
+    if (section && section !== activeSection) {
+      setActiveSection(section);
+    }
+  }, [section, activeSection]);
+
+  const handleNavigate = (sectionId) => {
+    setActiveSection(sectionId);
+    navigate(`/doctor/${sectionId}`);
+  };
 
   const doctorNav = useMemo(
     () => [
@@ -214,7 +229,7 @@ const DoctorProfilePage = ({ onLogout }) => {
       userName={storedUser?.displayName || profile.form.name}
       navItems={doctorNav}
       activeSection={activeSection}
-      onNavigate={setActiveSection}
+      onNavigate={handleNavigate}
       onLogout={onLogout}
       title={sectionMeta.title}
       subtitle={sectionMeta.subtitle}
@@ -235,7 +250,7 @@ const DoctorProfilePage = ({ onLogout }) => {
           canStartSession={appointmentsHook.canStartSession}
           onStartSession={handleStartSession}
           onSendLink={setSendLinkAppointment}
-          onNavigateToAvailability={() => setActiveSection('availability')}
+          onNavigateToAvailability={() => handleNavigate('availability')}
         />
       )}
 

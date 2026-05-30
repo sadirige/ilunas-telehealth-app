@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import PatientProfilePage from './pages/PatientProfilePage';
 import DoctorProfilePage from './pages/DoctorProfilePage';
@@ -47,19 +48,37 @@ const App = () => {
 	}, [user, role]);
 
 	if (!user) {
-		return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+		return (
+			<Routes>
+				<Route path="*" element={<AuthPage onAuthSuccess={handleAuthSuccess} />} />
+			</Routes>
+		);
 	}
 
 	if (role === 'patient') {
-		return <PatientProfilePage onLogout={handleLogout} />;
+		return (
+			<Routes>
+				<Route path="/patient/:section?" element={<PatientProfilePage onLogout={handleLogout} />} />
+				<Route path="*" element={<Navigate to="/patient/overview" replace />} />
+			</Routes>
+		);
 	}
 
 	if (role === 'doctor') {
-		return <DoctorProfilePage onLogout={handleLogout} />;
+		return (
+			<Routes>
+				<Route path="/doctor/:section?" element={<DoctorProfilePage onLogout={handleLogout} />} />
+				<Route path="*" element={<Navigate to="/doctor/overview" replace />} />
+			</Routes>
+		);
 	}
 
 	if (!role) {
-		return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+		return (
+			<Routes>
+				<Route path="*" element={<AuthPage onAuthSuccess={handleAuthSuccess} />} />
+			</Routes>
+		);
 	}
 
 	return null;

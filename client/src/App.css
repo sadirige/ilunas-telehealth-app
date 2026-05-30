@@ -761,6 +761,64 @@
   font-size: 0.95rem;
 }
 
+.appointment__main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.appointment__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment__info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.appointment__time {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.appointment__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.appointment__meeting {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.appointment__join-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ghost--danger {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.ghost--danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: var(--error);
+}
+
 .appointment__actions {
   display: flex;
   flex-direction: column;
@@ -831,6 +889,11 @@
   background: var(--accent-soft);
 }
 
+.booking--highlight {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(0, 119, 182, 0.08) 100%);
+}
+
 .booking__summary {
   display: flex;
   align-items: center;
@@ -839,11 +902,34 @@
   flex-wrap: wrap;
 }
 
+.booking__details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.booking__details h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.booking__meta {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
 .booking__actions {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.pill--accent {
+  background: var(--accent);
+  color: #fff;
 }
 
 /* ── Availability ── */
@@ -895,6 +981,164 @@
   background: var(--surface);
   font-size: 0.88rem;
   color: var(--ink-soft);
+}
+
+/* ── Doctor Card ── */
+
+.doctor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.doctor-card--selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.doctor-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.doctor-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.doctor-card__info h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.doctor-card__specialization {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.doctor-card__credentials {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.doctor-card__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.doctor-card__bio {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.doctor-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.doctor-card__view-btn {
+  width: 100%;
+}
+
+.availability-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.availability-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.availability-section h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.availability-section__count {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.availability-section--empty {
+  padding: 20px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.availability--expanded {
+  gap: 8px;
+}
+
+.slot-row__time {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.slot-row__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.slot-row__duration {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  padding: 2px 6px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+}
+
+.availability__more {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  text-align: center;
+  padding: 8px;
+  font-style: italic;
+}
+
+.hint--error {
+  color: var(--error);
+}
+
+.hint--subtle {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  opacity: 0.8;
+}
+
+.pill--fee {
+  background: var(--success-soft);
+  color: var(--success);
+  font-weight: 600;
+}
+
+.primary--compact {
+  padding: 6px 14px;
+  font-size: 0.85rem;
 }
 
 /* ── Empty state ── */
@@ -971,6 +1215,53 @@
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.modal--booking {
+  max-width: 560px;
+}
+
+.booking-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.booking-summary__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.booking-summary__section h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.booking-summary__value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.booking-summary__meta {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.field__required {
+  color: var(--error);
+  font-weight: 600;
 }
 
 .modal__actions a.primary {
@@ -1107,6 +1398,67 @@
   .app-shell__content {
     padding: 16px 20px 40px;
   }
+}
+
+/* ── Skeleton Loader ── */
+
+.skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--surface-hover) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton--default {
+  height: 16px;
+  width: 100%;
+}
+
+.skeleton--text {
+  height: 14px;
+  width: 80%;
+}
+
+.skeleton--title {
+  height: 24px;
+  width: 60%;
+}
+
+.skeleton--card {
+  height: 120px;
+  width: 100%;
+}
+
+.skeleton--avatar {
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+}
+
+.skeleton--button {
+  height: 36px;
+  width: 120px;
+  border-radius: 6px;
+}
+
+.skeleton--list-item {
+  height: 80px;
+  width: 100%;
 }
 
 @media (max-width: 640px) {
