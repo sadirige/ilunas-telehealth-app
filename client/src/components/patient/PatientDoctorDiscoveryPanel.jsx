@@ -1,6 +1,7 @@
 import SkeletonLoader from '../ui/SkeletonLoader';
 import SlotPicker from '../ui/SlotPicker';
 import FormField from '../ui/FormField';
+import EmptyState from '../ui/EmptyState';
 
 const SPECIALIZATIONS = [
   '',
