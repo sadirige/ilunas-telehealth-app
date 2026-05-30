@@ -12,6 +12,8 @@ const doctorProfileSchema = new mongoose.Schema(
     name: { type: String, trim: true, required: true },
     bio: { type: String, trim: true, required: true, maxlength: 1000 },
     specialization: { type: String, trim: true, required: true },
+    credentials: { type: String, trim: true, required: true, maxlength: 1000 },
+    consultationFee: { type: Number, required: true, min: 0 },
     profilePictureUrl: { type: String, trim: true }
   },
   { timestamps: true }

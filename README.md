@@ -47,6 +47,16 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## Telehealth API (Backend)
 
+### Appointment reminder job
+
+The server emits appointment reminder notifications shortly before scheduled visits.
+
+Environment variables (optional):
+
+- `APPOINTMENT_REMINDER_MINUTES` (default: 15)
+- `APPOINTMENT_REMINDER_WINDOW_SECONDS` (default: 60)
+- `APPOINTMENT_REMINDER_POLL_MS` (default: 60000)
+
 Base URL: `http://localhost:5000`
 
 ### Authentication
@@ -629,6 +639,7 @@ Notes
 
 - This is a Server-Sent Events (SSE) stream that stays open.
 - Use the `Authorization: Bearer <token>` header.
+- Browser EventSource clients can pass `?token=<jwt>` because headers are not supported.
 - Postman can open the stream, but it will not terminate until you stop it.
 
 Postman test snippet

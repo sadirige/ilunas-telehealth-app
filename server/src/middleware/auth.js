@@ -4,7 +4,9 @@ const { User } = require('../models/User');
 const authenticate = async (req, res, next) => {
   try {
     const header = req.headers.authorization || '';
-    const [, token] = header.split(' ');
+    const [, headerToken] = header.split(' ');
+    const queryToken = typeof req.query?.token === 'string' ? req.query.token : '';
+    const token = headerToken || queryToken;
 
     if (!token) {
       return res.status(401).json({ message: 'Missing auth token' });

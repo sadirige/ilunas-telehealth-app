@@ -18,6 +18,7 @@ const updateOptions = { new: true, runValidators: true, context: 'query' };
 
 router.post('/profile', requirePatient, async (req, res, next) => {
   try {
+    const payload = req.body || {};
     const {
       name,
       birthday,
@@ -26,13 +27,13 @@ router.post('/profile', requirePatient, async (req, res, next) => {
       profilePictureUrl,
       contactDetails,
       medicalHistory
-    } = req.body || {};
+    } = payload;
 
     const missingFields = requireFields(
       { name, birthday, weight, height, contactDetails, medicalHistory },
       ['name', 'birthday', 'weight', 'height', 'contactDetails', 'medicalHistory']
     );
-    const missingContact = requireNestedFields(contactDetails, 'contactDetails', [
+    const missingContact = requireNestedFields(payload, 'contactDetails', [
       'phone',
       'address',
       'emergencyContact'

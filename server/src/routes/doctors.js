@@ -20,16 +20,19 @@ const buildDoctorProfileResponse = (profile) => ({
   name: profile.name,
   bio: profile.bio,
   specialization: profile.specialization,
+  credentials: profile.credentials,
+  consultationFee: profile.consultationFee,
   profilePictureUrl: profile.profilePictureUrl
 });
 
 router.post('/profile', requireDoctor, async (req, res, next) => {
   try {
-    const { name, bio, specialization, profilePictureUrl } = req.body || {};
+    const { name, bio, specialization, credentials, consultationFee, profilePictureUrl } =
+      req.body || {};
 
     const missing = requireFields(
-      { name, bio, specialization },
-      ['name', 'bio', 'specialization']
+      { name, bio, specialization, credentials, consultationFee },
+      ['name', 'bio', 'specialization', 'credentials', 'consultationFee']
     );
     if (missing.length > 0) {
       return res.status(400).json({ message: formatMissingFieldsMessage(missing) });
@@ -45,6 +48,8 @@ router.post('/profile', requireDoctor, async (req, res, next) => {
       name,
       bio,
       specialization,
+      credentials,
+      consultationFee,
       profilePictureUrl: profilePictureUrl || ''
     });
 
@@ -128,7 +133,7 @@ router.get('/', requirePatient, async (req, res, next) => {
 
     const profiles = await DoctorProfile.find(filter)
       .sort({ createdAt: -1 })
-      .select('user name bio specialization profilePictureUrl');
+      .select('user name bio specialization credentials consultationFee profilePictureUrl');
 
     return res.status(200).json({ results: profiles.map(buildDoctorProfileResponse) });
   } catch (error) {
@@ -139,7 +144,7 @@ router.get('/', requirePatient, async (req, res, next) => {
 router.get('/:doctorId', requirePatient, async (req, res, next) => {
   try {
     const profile = await DoctorProfile.findById(req.params.doctorId).select(
-      'user name bio specialization profilePictureUrl'
+      'user name bio specialization credentials consultationFee profilePictureUrl'
     );
 
     if (!profile) {

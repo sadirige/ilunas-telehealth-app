@@ -5,6 +5,7 @@ const NOTIFICATION_TYPES = [
   'appointment_rescheduled',
   'appointment_canceled',
   'appointment_completed',
+  'appointment_reminder',
   'availability_created',
   'availability_removed'
 ];

@@ -1,12 +1,14 @@
 require('dotenv').config();
 const { createApp } = require('./app');
 const { connectDb } = require('./config/db');
+const { startAppointmentReminderJob } = require('./utils/appointmentReminders');
 
 const PORT = process.env.PORT || 5000;
 
 const start = async () => {
   await connectDb(process.env.MONGO_URI);
   const app = createApp();
+  startAppointmentReminderJob();
 
   app.listen(PORT, () => {
     console.log(`API listening on port ${PORT}`);
