@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
-import PatientProfilePage from './pages/PatientDashboardPage';
-import DoctorProfilePage from './pages/DoctorDashboardPage';
+import PatientDashboardPage from './pages/PatientDashboardPage';
+import DoctorDashboardPage from './pages/DoctorDashboardPage';
 
 const getStoredUser = () => {
 	try {
@@ -72,7 +72,7 @@ const App = () => {
 		const defaultSection = isNewUser ? 'profile' : 'overview';
 		return (
 			<Routes>
-				<Route path="/patient/:section?" element={<PatientProfilePage onLogout={handleLogout} />} />
+				<Route path="/patient/:section?" element={<PatientDashboardPage onLogout={handleLogout} />} />
 				<Route path="*" element={<Navigate to={`/patient/${defaultSection}`} replace />} />
 			</Routes>
 		);
@@ -82,7 +82,7 @@ const App = () => {
 		const defaultSection = isNewUser ? 'profile' : 'overview';
 		return (
 			<Routes>
-				<Route path="/doctor/:section?" element={<DoctorProfilePage onLogout={handleLogout} />} />
+				<Route path="/doctor/:section?" element={<DoctorDashboardPage onLogout={handleLogout} />} />
 				<Route path="*" element={<Navigate to={`/doctor/${defaultSection}`} replace />} />
 			</Routes>
 		);

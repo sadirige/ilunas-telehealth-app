@@ -49,7 +49,7 @@ const buildReminderLabel = (appointment) => {
   return '';
 };
 
-const DoctorProfilePage = ({ onLogout }) => {
+const DoctorDashboardPage = ({ onLogout }) => {
   const { section } = useParams();
   const navigate = useNavigate();
 
@@ -402,4 +402,4 @@ const DoctorProfilePage = ({ onLogout }) => {
   );
 };
 
-export default DoctorProfilePage;
+export default DoctorDashboardPage;
