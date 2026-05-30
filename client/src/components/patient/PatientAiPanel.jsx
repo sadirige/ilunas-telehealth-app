@@ -1,5 +1,6 @@
 import FormField from '../ui/FormField';
 import SlotPicker from '../ui/SlotPicker';
+import { getAvatarColor } from '../../utils/avatarColors';
 
 const TAGALOG_SYMPTOMS = [
   { tagalog: 'masakit sa dibdib', english: 'chest pain' },
@@ -127,8 +128,12 @@ const PatientAiPanel = ({
                     className="doctor-card__avatar doctor-card__avatar--image"
                   />
                 ) : (
-                  <div className="doctor-card__avatar" aria-hidden="true">
-                    {doctor.name?.charAt(0) || 'D'}
+                  <div
+                    className="doctor-card__avatar"
+                    style={{ backgroundColor: getAvatarColor(doctor.name) }}
+                    aria-hidden="true"
+                  >
+                    {doctor.name?.charAt(0)?.toUpperCase() || 'D'}
                   </div>
                 )}
                 <div className="doctor-card__info">

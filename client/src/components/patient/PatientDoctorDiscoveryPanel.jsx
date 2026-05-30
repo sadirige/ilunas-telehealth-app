@@ -2,6 +2,7 @@ import SkeletonLoader from '../ui/SkeletonLoader';
 import SlotPicker from '../ui/SlotPicker';
 import FormField from '../ui/FormField';
 import EmptyState from '../ui/EmptyState';
+import { getAvatarColor } from '../../utils/avatarColors';
 
 const SPECIALIZATIONS = [
   '',
@@ -119,8 +120,12 @@ const PatientDoctorDiscoveryPanel = ({
                       className="doctor-card__avatar doctor-card__avatar--image"
                     />
                   ) : (
-                    <div className="doctor-card__avatar" aria-hidden="true">
-                      {doctor.name?.charAt(0) || 'D'}
+                    <div
+                      className="doctor-card__avatar"
+                      style={{ backgroundColor: getAvatarColor(doctor.name) }}
+                      aria-hidden="true"
+                    >
+                      {doctor.name?.charAt(0)?.toUpperCase() || 'D'}
                     </div>
                   )}
                   <div className="doctor-card__info">

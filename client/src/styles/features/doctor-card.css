@@ -25,7 +25,7 @@
   height: 48px;
   border-radius: 50%;
   background: var(--accent-soft);
-  color: var(--accent-strong);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;

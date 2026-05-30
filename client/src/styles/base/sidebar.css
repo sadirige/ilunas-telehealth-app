@@ -37,7 +37,7 @@
   justify-content: center;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--accent-strong);
+  color: #fff;
 }
 
 .sidebar__avatar--placeholder {

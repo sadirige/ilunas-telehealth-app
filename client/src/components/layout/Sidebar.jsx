@@ -1,4 +1,5 @@
 import BrandLogo from '../ui/BrandLogo';
+import { getAvatarColor } from '../../utils/avatarColors';
 
 const Sidebar = ({
   roleLabel,
@@ -10,7 +11,10 @@ const Sidebar = ({
   onLogout,
   isOpen,
   onClose
-}) => (
+}) => {
+  const avatarColor = getAvatarColor(userName);
+
+  return (
   <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`} aria-label="Main navigation">
     <div className="sidebar__header">
       <BrandLogo subtitle={roleLabel} />
@@ -22,7 +26,10 @@ const Sidebar = ({
             className="sidebar__avatar"
           />
         ) : (
-          <div className="sidebar__avatar sidebar__avatar--placeholder">
+          <div
+            className="sidebar__avatar sidebar__avatar--placeholder"
+            style={{ backgroundColor: avatarColor }}
+          >
             {userName?.charAt(0)?.toUpperCase() || '?'}
           </div>
         )}
@@ -65,6 +72,7 @@ const Sidebar = ({
       </button>
     </div>
   </aside>
-);
+  );
+};
 
 export default Sidebar;
