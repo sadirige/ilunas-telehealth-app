@@ -1,0 +1,412 @@
+/* ── Availability ── */
+
+.availability {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.slot-row--active {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid rgba(0, 119, 182, 0.2);
+}
+
+.availability__preview {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-strong);
+  background: var(--surface-muted);
+}
+
+.availability__preview--compact {
+  margin-top: 0;
+  padding: 12px 16px;
+}
+
+.slot-preview {
+  display: grid;
+  gap: 6px;
+}
+
+.slot-preview--chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot-preview__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.availability__list-title {
+  font-size: 0.95rem;
+  margin: 20px 0 12px;
+  color: var(--ink);
+}
+
+.availability__list--flat {
+  margin: 0;
+  padding: 0;
+}
+
+.availability__list--flat .availability__item {
+  border-radius: var(--radius-sm);
+}
+
+.availability-details {
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.availability-details summary {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  list-style: none;
+}
+
+.availability-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.availability-details summary::before {
+  content: '▸ ';
+  color: var(--ink-muted);
+}
+
+.availability-details[open] summary::before {
+  content: '▾ ';
+}
+
+.availability-details .availability__list {
+  padding: 0 16px 16px;
+  margin: 0;
+}
+
+/* ── Week calendar (doctor availability) ── */
+
+.availability-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+}
+
+.availability-toolbar__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-right: 4px;
+}
+
+.duration-presets--toolbar {
+  margin-bottom: 0;
+  align-items: center;
+}
+
+.week-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.week-calendar__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.week-calendar__nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.week-calendar__range {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 140px;
+  text-align: center;
+}
+
+.week-calendar__scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  min-width: 720px;
+}
+
+.week-calendar__header,
+.week-calendar__body {
+  display: grid;
+  grid-template-columns: 56px repeat(7, minmax(88px, 1fr));
+}
+
+.week-calendar__header {
+  border-bottom: 1px solid var(--border);
+}
+
+.week-calendar__body {
+  align-items: start;
+}
+
+.week-calendar__columns {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(88px, 1fr));
+}
+
+.week-calendar__corner {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+
+.week-calendar__day-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+
+.week-calendar__day-header--today {
+  background: var(--accent-soft);
+}
+
+.week-calendar__day-header--today .week-calendar__date {
+  background: var(--accent);
+  color: #fff;
+}
+
+.week-calendar__weekday {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+}
+
+.week-calendar__date {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.week-calendar__times {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  height: fit-content;
+}
+
+.week-calendar__time-label {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0 8px;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.week-calendar__column {
+  position: relative;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.week-calendar__column--past {
+  background: var(--surface-muted);
+  opacity: 0.65;
+}
+
+.week-calendar__cell {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid rgba(26, 35, 50, 0.05);
+  background: transparent;
+  cursor: crosshair;
+}
+
+.week-calendar__cell:hover {
+  background: var(--accent-soft);
+}
+
+.week-calendar__cell--past {
+  background: var(--surface-muted);
+  cursor: default;
+  opacity: 0.4;
+}
+
+.week-calendar__cell--past:hover {
+  background: var(--surface-muted);
+}
+
+.week-calendar__block {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+  border: 1px solid rgba(0, 119, 182, 0.35);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.week-calendar__block:hover {
+  background: rgba(0, 119, 182, 0.2);
+  border-color: var(--accent);
+}
+
+.week-calendar__block-time {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.week-calendar__selection {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  z-index: 1;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 119, 182, 0.12);
+  pointer-events: none;
+}
+
+.week-calendar__selection--dragging {
+  background: rgba(0, 119, 182, 0.18);
+}
+
+.week-calendar__hint {
+  margin: 0;
+}
+
+.week-calendar__action-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 119, 182, 0.25);
+  background: var(--accent-soft);
+}
+
+.week-calendar__action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Doctor availability layout ── */
+
+.panel--availability {
+  gap: 16px;
+}
+
+.availability-calendar-primary {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: 12px 12px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.availability-calendar-primary .week-calendar__scroll {
+  max-height: min(520px, calc(100svh - 220px));
+}
+
+@media (min-width: 1200px) {
+  .availability-calendar-primary .week-calendar__scroll {
+    max-height: min(480px, calc(100svh - 200px));
+  }
+}
+
+@media (min-width: 1400px) {
+  .availability-calendar-primary .week-calendar__scroll {
+    max-height: min(450px, calc(100svh - 180px));
+  }
+}
+
+.availability-calendar-primary__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.availability-disclosures {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

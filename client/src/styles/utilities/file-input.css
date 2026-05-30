@@ -1,0 +1,25 @@
+/* ── File Input ── */
+
+.file-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.file-input-wrapper input[type="file"] {
+  flex: 1;
+}
+
+.file-input-wrapper .ghost--icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.file-input-wrapper input[type="file"]:disabled + .ghost--icon {
+  opacity: 0.5;
+}

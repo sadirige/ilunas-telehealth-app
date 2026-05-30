@@ -1,0 +1,27 @@
+/* ── Appointments ── */
+
+.previsit-checklist {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  max-width: 240px;
+}
+
+.previsit-checklist__title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin: 0 0 6px;
+}
+
+.previsit-checklist__list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}

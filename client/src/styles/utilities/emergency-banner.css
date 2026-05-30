@@ -1,0 +1,15 @@
+/* ── Emergency Banner ── */
+
+.emergency-banner {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  background: var(--warning-soft);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.emergency-banner strong {
+  color: var(--warning);
+}

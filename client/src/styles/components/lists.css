@@ -1,0 +1,158 @@
+/* ── Lists ── */
+
+.appointment__list,
+.notification__list,
+.records__list,
+.availability__list {
+  display: grid;
+  gap: 10px;
+}
+
+.appointment__item,
+.notification__item,
+.records__item,
+.availability__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.15s ease;
+}
+
+.appointment__item:hover,
+.records__item:hover {
+  border-color: var(--border-strong);
+}
+
+.appointment__item h4,
+.records__item h4,
+.notification__item h4 {
+  font-size: 0.95rem;
+}
+
+.appointment__main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.appointment__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment__info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.appointment__time {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.appointment__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.appointment__meeting {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.appointment__join-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appointment__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.appointment__actions .primary {
+  align-self: stretch;
+  text-align: center;
+}
+
+.appointment__details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.appointment__stack {
+  display: grid;
+  gap: 12px;
+  min-width: 260px;
+  flex: 1;
+}
+
+.appointment__row {
+  display: grid;
+  gap: 10px;
+}
+
+.appointment__meta {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.appointment__reschedule {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.notification__item--unread {
+  border-color: rgba(0, 119, 182, 0.3);
+  background: var(--accent-soft);
+}
+
+.notification__meta,
+.records__meta {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.appointment__item--upcoming {
+  border-color: rgba(0, 119, 182, 0.2);
+  background: linear-gradient(to right, var(--accent-soft) 0%, var(--surface) 12%);
+}
+
+.appointment__reason {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.appointment__reason-label {
+  font-weight: 600;
+  color: var(--ink-muted);
+}

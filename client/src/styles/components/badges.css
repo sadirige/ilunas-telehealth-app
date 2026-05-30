@@ -1,0 +1,80 @@
+/* ── Status badges ── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge--scheduled {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--info);
+}
+
+.status-badge--success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.status-badge--progress {
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--accent-teal);
+}
+
+.status-badge--warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.status-badge--muted {
+  background: var(--surface-strong);
+  color: var(--ink-soft);
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pill--accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+.pill--warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.pill--fee {
+  background: var(--success-soft);
+  color: var(--success);
+  font-weight: 600;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
