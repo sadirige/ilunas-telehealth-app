@@ -10,6 +10,7 @@ const AppShell = ({
   onLogout,
   title,
   subtitle,
+  showEmergencyBanner = false,
   children
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,7 +59,15 @@ const AppShell = ({
           </div>
         </header>
 
-        <main className="app-shell__content">{children}</main>
+        <main className="app-shell__content">
+          {showEmergencyBanner && (
+            <div className="emergency-banner" role="note">
+              <strong>Not for emergencies.</strong> If you are experiencing a medical emergency, call
+              your local emergency number immediately.
+            </div>
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );

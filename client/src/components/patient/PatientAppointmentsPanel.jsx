@@ -1,6 +1,8 @@
 import EmptyState from '../ui/EmptyState';
 import StatusBadge from '../ui/StatusBadge';
 import SkeletonLoader from '../ui/SkeletonLoader';
+import FormField from '../ui/FormField';
+import { formatSlotDateTime, getTimezoneLabel } from '../../utils/datetime';
 
 const PatientAppointmentsPanel = ({
   appointmentsStatus,
@@ -22,42 +24,16 @@ const PatientAppointmentsPanel = ({
   onOpenConfirm,
   onClearSelection,
   onStartReschedule,
-  onCancelAppointment,
+  onRequestCancel,
   onFetchMeeting,
   onRescheduleChange,
   onRescheduleSubmit,
   onCancelReschedule,
   onNavigateToDoctors
 }) => {
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const isToday = date.toDateString() === today.toDateString();
-    const isTomorrow = date.toDateString() === tomorrow.toDateString();
-    
-    let dateStr;
-    if (isToday) {
-      dateStr = 'Today';
-    } else if (isTomorrow) {
-      dateStr = 'Tomorrow';
-    } else {
-      dateStr = date.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-    }
-    
-    const timeStr = date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-    
-    return `${dateStr}, ${timeStr}`;
+  const isUpcoming = (appointment) => {
+    const scheduledAt = new Date(appointment.scheduledAt).getTime();
+    return appointment.status === 'scheduled' && scheduledAt >= Date.now();
   };
 
   return (
@@ -86,11 +62,12 @@ const PatientAppointmentsPanel = ({
             <div className="booking__details">
               <h3>{selectedSlot.doctor.name}</h3>
               <p className="booking__meta">
-                {selectedSlot.doctor.specialization} · {formatDateTime(selectedSlot.slot.startAt)}
+                {selectedSlot.doctor.specialization} ·{' '}
+                {formatSlotDateTime(selectedSlot.slot.startAt)}
               </p>
             </div>
             <div className="booking__actions">
-              <span className="pill pill--accent">Selected slot</span>
+              <span className="pill pill--accent">Ready to book</span>
               <button type="button" className="primary primary--compact" onClick={onOpenConfirm}>
                 Review & confirm
               </button>
@@ -101,7 +78,15 @@ const PatientAppointmentsPanel = ({
           </div>
         </div>
       ) : (
-        <p className="hint">Choose a time slot from a doctor to start booking.</p>
+        <div className="panel panel--nested panel--hint">
+          <p className="hint">
+            Select a time slot from{' '}
+            <button type="button" className="link-btn" onClick={onNavigateToDoctors}>
+              Find doctors
+            </button>{' '}
+            to schedule a consultation.
+          </p>
+        </div>
       )}
 
       <div className="panel panel--nested">
@@ -111,8 +96,7 @@ const PatientAppointmentsPanel = ({
             <p>View and manage your scheduled consultations.</p>
           </div>
           <div className="filter-row">
-            <label className="field">
-              Status
+            <FormField label="Status">
               <select value={appointmentStatusFilter} onChange={onStatusFilterChange}>
                 <option value="all">All</option>
                 <option value="scheduled">Scheduled</option>
@@ -121,15 +105,14 @@ const PatientAppointmentsPanel = ({
                 <option value="in_progress">In progress</option>
                 <option value="no_show">No show</option>
               </select>
-            </label>
-            <label className="field">
-              Time
+            </FormField>
+            <FormField label="Time">
               <select value={appointmentTimeFilter} onChange={onTimeFilterChange}>
                 <option value="upcoming">Upcoming</option>
                 <option value="past">Past</option>
                 <option value="all">All</option>
               </select>
-            </label>
+            </FormField>
           </div>
         </div>
 
@@ -151,15 +134,26 @@ const PatientAppointmentsPanel = ({
               const isRescheduling = rescheduleId === appointment.id;
               const meetingUrl = appointment.meetingUrl;
               const reminderLabel = buildReminderLabel(appointment);
+              const upcoming = isUpcoming(appointment);
 
               return (
-                <div key={appointment.id} className="appointment__item">
+                <div
+                  key={appointment.id}
+                  className={`appointment__item ${upcoming ? 'appointment__item--upcoming' : ''}`}
+                >
                   <div className="appointment__main">
                     <div className="appointment__info">
                       <h4>{doctorNameMap.get(appointment.doctor) || 'Doctor'}</h4>
                       <p className="appointment__time">
-                        {formatDateTime(appointment.scheduledAt)} · {appointment.durationMinutes} min
+                        {formatSlotDateTime(appointment.scheduledAt)} ·{' '}
+                        {appointment.durationMinutes} min · {getTimezoneLabel()}
                       </p>
+                      {appointment.reason && (
+                        <p className="appointment__reason">
+                          <span className="appointment__reason-label">Reason:</span>{' '}
+                          {appointment.reason}
+                        </p>
+                      )}
                       <div className="appointment__badges">
                         <StatusBadge status={appointment.status} />
                         {reminderLabel && (
@@ -167,8 +161,18 @@ const PatientAppointmentsPanel = ({
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="appointment__meeting">
+                      {upcoming && (
+                        <div className="previsit-checklist">
+                          <p className="previsit-checklist__title">Before your visit</p>
+                          <ul className="previsit-checklist__list">
+                            <li>Find a quiet, private space</li>
+                            <li>Have your ID and medications ready</li>
+                            <li>Test your camera and microphone</li>
+                          </ul>
+                        </div>
+                      )}
                       {meetingUrl ? (
                         <a
                           className="primary primary--compact appointment__join-btn"
@@ -179,50 +183,56 @@ const PatientAppointmentsPanel = ({
                           Join meeting
                         </a>
                       ) : (
-                        <button
-                          type="button"
-                          className="ghost ghost--compact"
-                          onClick={() => onFetchMeeting(appointment.id)}
-                          disabled={actionLoading}
-                        >
-                          Get meeting link
-                        </button>
+                        upcoming && (
+                          <button
+                            type="button"
+                            className="ghost ghost--compact"
+                            onClick={() => onFetchMeeting(appointment.id)}
+                            disabled={actionLoading}
+                          >
+                            Get meeting link
+                          </button>
+                        )
                       )}
                     </div>
                   </div>
 
-                  <div className="appointment__actions">
-                    <button
-                      type="button"
-                      className="ghost ghost--compact"
-                      onClick={() => onStartReschedule(appointment)}
-                      disabled={actionLoading || appointment.status !== 'scheduled'}
-                      title="Reschedule appointment"
-                    >
-                      Reschedule
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost ghost--compact ghost--danger"
-                      onClick={() => onCancelAppointment(appointment.id)}
-                      disabled={actionLoading || appointment.status !== 'scheduled'}
-                      title="Cancel appointment"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                  {upcoming && (
+                    <div className="appointment__actions">
+                      <button
+                        type="button"
+                        className="ghost ghost--compact"
+                        onClick={() => onStartReschedule(appointment)}
+                        disabled={actionLoading}
+                        title="Reschedule appointment"
+                      >
+                        Reschedule
+                      </button>
+                      <button
+                        type="button"
+                        className="ghost ghost--compact ghost--danger"
+                        onClick={() => onRequestCancel(appointment.id)}
+                        disabled={actionLoading}
+                        title="Cancel appointment"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
 
                   {isRescheduling && (
                     <form className="appointment__reschedule" onSubmit={onRescheduleSubmit}>
-                      <label className="field">
-                        New date and time
+                      <FormField
+                        label="New date and time"
+                        hint={`Times shown in ${getTimezoneLabel()}`}
+                      >
                         <input
                           type="datetime-local"
                           value={rescheduleAt}
                           onChange={onRescheduleChange}
                           required
                         />
-                      </label>
+                      </FormField>
                       <div className="appointment__actions">
                         <button type="submit" className="primary" disabled={actionLoading}>
                           {actionLoading ? 'Saving...' : 'Save changes'}

@@ -114,6 +114,31 @@ const deleteDoctorAvailability = (availabilityId) =>
         method: 'DELETE'
     });
 
+const getAvailabilityTemplates = () => apiRequest('/api/availability-templates/doctor');
+
+const createAvailabilityTemplate = (payload) =>
+    apiRequest('/api/availability-templates', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+const updateAvailabilityTemplate = (templateId, payload) =>
+    apiRequest(`/api/availability-templates/${templateId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+    });
+
+const deleteAvailabilityTemplate = (templateId) =>
+    apiRequest(`/api/availability-templates/${templateId}`, {
+        method: 'DELETE'
+    });
+
+const applyAvailabilityTemplates = (weeksAhead) =>
+    apiRequest('/api/availability-templates/apply', {
+        method: 'POST',
+        body: JSON.stringify({ weeksAhead })
+    });
+
 const createAppointment = (payload) =>
     apiRequest('/api/appointments', {
         method: 'POST',
@@ -252,6 +277,11 @@ export {
     getDoctorAvailabilities,
     createDoctorAvailability,
     deleteDoctorAvailability,
+    getAvailabilityTemplates,
+    createAvailabilityTemplate,
+    updateAvailabilityTemplate,
+    deleteAvailabilityTemplate,
+    applyAvailabilityTemplates,
     createAppointment,
     getPatientAppointments,
     getDoctorAppointments,

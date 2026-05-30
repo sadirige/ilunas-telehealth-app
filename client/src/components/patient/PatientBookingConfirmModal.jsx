@@ -1,3 +1,8 @@
+import { useState } from 'react';
+import useModal from '../../hooks/useModal';
+import FormField from '../ui/FormField';
+import { formatSlotDateTime, slotDurationMinutes, getTimezoneLabel } from '../../utils/datetime';
+
 const PatientBookingConfirmModal = ({
   selectedSlot,
   bookingForm,
@@ -6,36 +11,34 @@ const PatientBookingConfirmModal = ({
   onSubmit,
   onChange
 }) => {
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const isToday = date.toDateString() === today.toDateString();
-    
-    const dateStr = isToday ? 'Today' : date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    const timeStr = date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-    
-    return `${dateStr} at ${timeStr}`;
+  const { modalRef, handleBackdropClick } = useModal(true, onClose);
+  const [consentChecked, setConsentChecked] = useState(false);
+
+  const duration = slotDurationMinutes(selectedSlot.slot);
+
+  const handleSubmit = (event) => {
+    if (!consentChecked) {
+      event.preventDefault();
+      return;
+    }
+    onSubmit(event);
   };
 
-  const duration = Math.round((new Date(selectedSlot.slot.endAt) - new Date(selectedSlot.slot.startAt)) / 60000);
-
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
-      <div className="modal modal--booking">
+    <div
+      className="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-modal-title"
+      onClick={handleBackdropClick}
+    >
+      <div className="modal modal--booking" ref={modalRef}>
         <div className="modal__header">
           <div>
             <h3 id="booking-modal-title">Confirm your appointment</h3>
-            <p>Review the details below before confirming</p>
+            <p>Review the details below before confirming your visit.</p>
           </div>
-          <button type="button" className="ghost ghost--compact" onClick={onClose} aria-label="Close modal">
+          <button type="button" className="ghost ghost--compact" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
@@ -49,50 +52,57 @@ const PatientBookingConfirmModal = ({
 
           <div className="booking-summary__section">
             <h4>Date & time</h4>
-            <p className="booking-summary__value">{formatDateTime(selectedSlot.slot.startAt)}</p>
-            <p className="booking-summary__meta">Duration: {duration} minutes</p>
+            <p className="booking-summary__value">{formatSlotDateTime(selectedSlot.slot.startAt, { long: true })}</p>
+            <p className="booking-summary__meta">
+              {duration} minutes · {getTimezoneLabel()}
+            </p>
           </div>
 
           <div className="booking-summary__section">
             <h4>Consultation fee</h4>
             <p className="booking-summary__value">
-              {selectedSlot.doctor.consultationFee ? `₱${selectedSlot.doctor.consultationFee}` : 'Fee TBD'}
+              {selectedSlot.doctor.consultationFee
+                ? `₱${selectedSlot.doctor.consultationFee}`
+                : 'Fee TBD'}
             </p>
           </div>
         </div>
 
-        <form className="form" onSubmit={onSubmit}>
-          <label className="field">
-            Duration preference
-            <select
-              name="durationMinutes"
-              value={bookingForm.durationMinutes}
-              onChange={onChange}
-              required
-            >
-              <option value="15">15 minutes</option>
-              <option value="30">30 minutes</option>
-              <option value="45">45 minutes</option>
-              <option value="60">60 minutes</option>
-            </select>
-          </label>
-          <label className="field">
-            Reason for visit <span className="field__required">*</span>
+        <form className="form" onSubmit={handleSubmit}>
+          <FormField
+            label="Reason for visit"
+            required
+            hint="Briefly describe your symptoms or what you'd like to discuss"
+          >
             <textarea
               name="reason"
               rows="3"
               value={bookingForm.reason}
               onChange={onChange}
-              placeholder="Please describe your symptoms or reason for consultation"
+              placeholder="e.g., Persistent headache for 3 days, mild fever"
               required
             />
+          </FormField>
+
+          <label className="field field--checkbox">
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(event) => setConsentChecked(event.target.checked)}
+              required
+            />
+            <span>
+              I understand this is a telehealth consultation and not for medical emergencies.
+              I consent to sharing my health information with this clinician for this visit.
+            </span>
           </label>
+
           <div className="modal__actions">
-            <button type="submit" className="primary" disabled={submitting}>
+            <button type="submit" className="primary" disabled={submitting || !consentChecked}>
               {submitting ? 'Confirming...' : 'Confirm booking'}
             </button>
             <button type="button" className="ghost" onClick={onClose} disabled={submitting}>
-              Cancel
+              Go back
             </button>
           </div>
         </form>

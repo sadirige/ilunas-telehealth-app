@@ -18,8 +18,12 @@ const AuthPage = ({ onAuthSuccess }) => {
     handleLoginSubmit,
     handleRegisterSubmit,
     setShowLoginPassword,
-    setShowRegisterPassword
+    setShowRegisterPassword,
+    validatePassword
   } = useAuthForm(onAuthSuccess);
+
+  const passwordValidation = validatePassword(registerForm.password);
+  const isPasswordValid = passwordValidation.isValid;
 
   return (
     <div className="shell">
@@ -125,6 +129,9 @@ const AuthPage = ({ onAuthSuccess }) => {
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
               <p className="hint">Your session is protected with secure authentication.</p>
+              <p className="hint hint--subtle">
+                Not for emergencies — call your local emergency number if you need urgent care.
+              </p>
             </form>
           ) : (
             <form className="form" onSubmit={handleRegisterSubmit}>
@@ -184,6 +191,63 @@ const AuthPage = ({ onAuthSuccess }) => {
                   </button>
                 </div>
               </label>
+              {registerForm.password && (
+                <div className="password-requirements">
+                  <p className="password-requirements__title">Password requirements:</p>
+                  <ul className="password-requirements__list">
+                    <li className={passwordValidation.requirements.minLength ? 'password-requirements__item password-requirements__item--valid' : 'password-requirements__item'}>
+                      <span className="password-requirements__icon">{passwordValidation.requirements.minLength ? '✓' : '✗'}</span>
+                      8+ characters
+                    </li>
+                    <li className={passwordValidation.requirements.hasUppercase ? 'password-requirements__item password-requirements__item--valid' : 'password-requirements__item'}>
+                      <span className="password-requirements__icon">{passwordValidation.requirements.hasUppercase ? '✓' : '✗'}</span>
+                      One uppercase letter
+                    </li>
+                    <li className={passwordValidation.requirements.hasNumber ? 'password-requirements__item password-requirements__item--valid' : 'password-requirements__item'}>
+                      <span className="password-requirements__icon">{passwordValidation.requirements.hasNumber ? '✓' : '✗'}</span>
+                      One number
+                    </li>
+                    <li className={passwordValidation.requirements.hasSpecial ? 'password-requirements__item password-requirements__item--valid' : 'password-requirements__item'}>
+                      <span className="password-requirements__icon">{passwordValidation.requirements.hasSpecial ? '✓' : '✗'}</span>
+                      One special character
+                    </li>
+                  </ul>
+                </div>
+              )}
+              <label className="field">
+                Confirm password
+                <div className="field__row">
+                  <input
+                    type={showRegisterPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={registerForm.confirmPassword}
+                    onChange={handleRegisterChange}
+                    placeholder="Confirm your password"
+                    autoComplete="new-password"
+                    disabled={!isPasswordValid}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="eye"
+                    onClick={() => setShowRegisterPassword((prev) => !prev)}
+                    aria-label={showRegisterPassword ? 'Hide password' : 'Show password'}
+                    disabled={!isPasswordValid}
+                  >
+                    {showRegisterPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </label>
               <label className="field">
                 I am a
                 <select name="role" value={registerForm.role} onChange={handleRegisterChange}>
@@ -198,6 +262,9 @@ const AuthPage = ({ onAuthSuccess }) => {
                 {loading ? 'Creating account...' : 'Create account'}
               </button>
               <p className="hint">Next, complete your profile to get started.</p>
+              <p className="hint hint--subtle">
+                By creating an account, you agree to our secure handling of your health information.
+              </p>
             </form>
           )}
         </div>

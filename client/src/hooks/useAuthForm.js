@@ -9,6 +9,7 @@ const roles = [
 const initialRegisterState = {
   email: '',
   password: '',
+  confirmPassword: '',
   displayName: '',
   role: 'patient'
 };
@@ -18,11 +19,11 @@ const initialLoginState = {
   password: ''
 };
 
-const storeSession = (data, onAuthSuccess) => {
+const storeSession = (data, onAuthSuccess, isNewUser = false) => {
   localStorage.setItem('authToken', data.token);
   localStorage.setItem('authUser', JSON.stringify(data.user));
   if (onAuthSuccess) {
-    onAuthSuccess(data.user);
+    onAuthSuccess(data.user, isNewUser);
   }
 };
 
@@ -34,6 +35,17 @@ const useAuthForm = (onAuthSuccess) => {
   const [loading, setLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+
+  const validatePassword = (password) => {
+    const requirements = {
+      minLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+    const isValid = Object.values(requirements).every(Boolean);
+    return { requirements, isValid };
+  };
 
   const handleModeChange = (nextMode) => {
     setMode(nextMode);
@@ -73,8 +85,21 @@ const useAuthForm = (onAuthSuccess) => {
     setStatus({ type: 'idle', message: '' });
 
     try {
+      const { isValid } = validatePassword(registerForm.password);
+      if (!isValid) {
+        setStatus({ type: 'error', message: 'Password does not meet all requirements.' });
+        setLoading(false);
+        return;
+      }
+
+      if (registerForm.password !== registerForm.confirmPassword) {
+        setStatus({ type: 'error', message: 'Passwords do not match.' });
+        setLoading(false);
+        return;
+      }
+
       const data = await registerUser(registerForm);
-      storeSession(data, onAuthSuccess);
+      storeSession(data, onAuthSuccess, true);
       setStatus({ type: 'success', message: 'Account created. Complete your profile next.' });
       setRegisterForm(initialRegisterState);
     } catch (error) {
@@ -99,7 +124,8 @@ const useAuthForm = (onAuthSuccess) => {
     handleLoginSubmit,
     handleRegisterSubmit,
     setShowLoginPassword,
-    setShowRegisterPassword
+    setShowRegisterPassword,
+    validatePassword
   };
 };
 

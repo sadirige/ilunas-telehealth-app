@@ -4,6 +4,12 @@ import {
   deleteDoctorAvailability,
   getDoctorAvailabilities
 } from '../api/client';
+import {
+  addWeeks,
+  filterUpcomingSlots,
+  formatLocalDateTimeInput,
+  getWeekStart
+} from '../utils/datetime';
 
 const emptyForm = {
   startAt: '',
@@ -11,10 +17,20 @@ const emptyForm = {
   slotMinutes: '30'
 };
 
-const formatLocalDateTime = (date) => {
-  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-  const local = new Date(date.getTime() - offsetMs);
-  return local.toISOString().slice(0, 16);
+const buildSlotsInRange = (startDate, endDate, slotMinutes) => {
+  const durationMs = endDate.getTime() - startDate.getTime();
+  const slotMs = slotMinutes * 60000;
+  const slotCount = Math.floor(durationMs / slotMs);
+
+  if (slotCount <= 0) {
+    throw new Error('Time range must be at least one slot long');
+  }
+
+  return Array.from({ length: slotCount }, (_, index) => {
+    const slotStart = new Date(startDate.getTime() + index * slotMs);
+    const slotEnd = new Date(slotStart.getTime() + slotMs);
+    return { slotStart, slotEnd };
+  });
 };
 
 const useDoctorAvailability = () => {
@@ -23,14 +39,40 @@ const useDoctorAvailability = () => {
   const [status, setStatus] = useState({ type: 'idle', message: '' });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [weekAnchor, setWeekAnchor] = useState(() => getWeekStart());
+  const [calendarSelection, setCalendarSelection] = useState(null);
+
+  const weekStart = useMemo(() => getWeekStart(weekAnchor), [weekAnchor]);
+
+  const upcomingAvailabilities = useMemo(
+    () => filterUpcomingSlots(availabilities),
+    [availabilities]
+  );
+
+  const weekAvailabilities = useMemo(() => {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    return upcomingAvailabilities.filter((item) => {
+      const start = new Date(item.startAt);
+      return start >= weekStart && start < weekEnd;
+    });
+  }, [upcomingAvailabilities, weekStart]);
 
   const preview = useMemo(() => {
-    if (!form.startAt || !form.endAt) {
+    const startAt = calendarSelection?.startAt
+      ? formatLocalDateTimeInput(calendarSelection.startAt)
+      : form.startAt;
+    const endAt = calendarSelection?.endAt
+      ? formatLocalDateTimeInput(calendarSelection.endAt)
+      : form.endAt;
+
+    if (!startAt || !endAt) {
       return { slots: [], error: '' };
     }
 
-    const startDate = new Date(form.startAt);
-    const endDate = new Date(form.endAt);
+    const startDate = new Date(startAt);
+    const endDate = new Date(endAt);
     const slotMinutes = Number(form.slotMinutes);
 
     if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
@@ -45,22 +87,16 @@ const useDoctorAvailability = () => {
       return { slots: [], error: 'End time must be after start time.' };
     }
 
-    const durationMs = endDate.getTime() - startDate.getTime();
-    const slotMs = slotMinutes * 60000;
-    const slotCount = Math.floor(durationMs / slotMs);
-
-    if (slotCount <= 0) {
-      return { slots: [], error: 'Time range must be at least one slot long.' };
+    try {
+      const slots = buildSlotsInRange(startDate, endDate, slotMinutes).map(({ slotStart, slotEnd }) => ({
+        startAt: slotStart,
+        endAt: slotEnd
+      }));
+      return { slots, error: '' };
+    } catch (error) {
+      return { slots: [], error: error.message };
     }
-
-    const slots = Array.from({ length: slotCount }, (_, index) => {
-      const slotStart = new Date(startDate.getTime() + index * slotMs);
-      const slotEnd = new Date(slotStart.getTime() + slotMs);
-      return { startAt: slotStart, endAt: slotEnd };
-    });
-
-    return { slots, error: '' };
-  }, [form.startAt, form.endAt, form.slotMinutes]);
+  }, [calendarSelection, form.startAt, form.endAt, form.slotMinutes]);
 
   const loadAvailabilities = useCallback(async () => {
     setLoading(true);
@@ -80,9 +116,25 @@ const useDoctorAvailability = () => {
     loadAvailabilities();
   }, [loadAvailabilities]);
 
+  const persistRange = async (startDate, endDate, slotMinutes) => {
+    const slots = buildSlotsInRange(startDate, endDate, slotMinutes);
+
+    await Promise.all(
+      slots.map(({ slotStart, slotEnd }) =>
+        createDoctorAvailability({
+          startAt: formatLocalDateTimeInput(slotStart),
+          endAt: formatLocalDateTimeInput(slotEnd)
+        })
+      )
+    );
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'startAt' || name === 'endAt') {
+      setCalendarSelection(null);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -111,27 +163,10 @@ const useDoctorAvailability = () => {
         throw new Error('End time must be after start time');
       }
 
-      const durationMs = endDate.getTime() - startDate.getTime();
-      const slotMs = slotMinutes * 60000;
-      const slotCount = Math.floor(durationMs / slotMs);
-
-      if (slotCount <= 0) {
-        throw new Error('Time range must be at least one slot long');
-      }
-
-      const requests = Array.from({ length: slotCount }, (_, index) => {
-        const slotStart = new Date(startDate.getTime() + index * slotMs);
-        const slotEnd = new Date(slotStart.getTime() + slotMinutes * 60000);
-
-        return createDoctorAvailability({
-          startAt: formatLocalDateTime(slotStart),
-          endAt: formatLocalDateTime(slotEnd)
-        });
-      });
-
-      await Promise.all(requests);
+      await persistRange(startDate, endDate, slotMinutes);
       setStatus({ type: 'success', message: 'Availability added.' });
       setForm(emptyForm);
+      setCalendarSelection(null);
       await loadAvailabilities();
     } catch (error) {
       setStatus({ type: 'error', message: error.message });
@@ -151,9 +186,77 @@ const useDoctorAvailability = () => {
     }
   };
 
+  const handleWeekChange = (direction) => {
+    setWeekAnchor((prev) => addWeeks(getWeekStart(prev), direction));
+    setCalendarSelection(null);
+  };
+
+  const handleGoToToday = () => {
+    setWeekAnchor(getWeekStart());
+    setCalendarSelection(null);
+  };
+
+  const handleCalendarSelectRange = ({ startAt, endAt }) => {
+    const now = new Date();
+    let adjustedStart = startAt;
+
+    if (endAt <= now) {
+      setStatus({ type: 'error', message: 'Select a time in the future.' });
+      return;
+    }
+
+    if (adjustedStart < now) {
+      adjustedStart = now;
+    }
+
+    if (endAt <= adjustedStart) {
+      setStatus({ type: 'error', message: 'Select a valid time range.' });
+      return;
+    }
+
+    setStatus({ type: 'idle', message: '' });
+    setCalendarSelection({ startAt: adjustedStart, endAt });
+    setForm((prev) => ({
+      ...prev,
+      startAt: formatLocalDateTimeInput(adjustedStart),
+      endAt: formatLocalDateTimeInput(endAt)
+    }));
+  };
+
+  const handleCalendarClearSelection = () => {
+    setCalendarSelection(null);
+  };
+
+  const handleCalendarSubmit = async () => {
+    if (!calendarSelection) return;
+
+    setSaving(true);
+    setStatus({ type: 'idle', message: '' });
+
+    try {
+      const slotMinutes = Number(form.slotMinutes);
+      if (!slotMinutes || slotMinutes <= 0) {
+        throw new Error('Slot duration must be at least 1 minute');
+      }
+
+      await persistRange(calendarSelection.startAt, calendarSelection.endAt, slotMinutes);
+      setStatus({ type: 'success', message: 'Availability added.' });
+      setCalendarSelection(null);
+      setForm(emptyForm);
+      await loadAvailabilities();
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return {
     form,
-    availabilities,
+    availabilities: upcomingAvailabilities,
+    weekStart,
+    weekAvailabilities,
+    calendarSelection,
     previewSlots: preview.slots,
     previewError: preview.error,
     status,
@@ -161,7 +264,13 @@ const useDoctorAvailability = () => {
     saving,
     handleChange,
     handleSubmit,
-    handleDelete
+    handleDelete,
+    handleWeekChange,
+    handleGoToToday,
+    handleCalendarSelectRange,
+    handleCalendarClearSelection,
+    handleCalendarSubmit,
+    refreshAvailabilities: loadAvailabilities
   };
 };
 

@@ -6,6 +6,7 @@ import {
   getPatientAppointments,
   rescheduleAppointment
 } from '../api/client';
+import { formatLocalDateTimeInput, slotDurationMinutes } from '../utils/datetime';
 
 const defaultForm = {
   durationMinutes: '30',
@@ -25,6 +26,7 @@ const useAppointmentBooking = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [rescheduleId, setRescheduleId] = useState('');
   const [rescheduleAt, setRescheduleAt] = useState('');
+  const [cancelTargetId, setCancelTargetId] = useState('');
 
   const hasSelection = useMemo(() => Boolean(selectedSlot), [selectedSlot]);
 
@@ -48,8 +50,11 @@ const useAppointmentBooking = () => {
 
   const handleSelectSlot = (doctor, slot) => {
     setSelectedSlot({ doctor, slot });
+    setBookingForm((prev) => ({
+      ...prev,
+      durationMinutes: String(slotDurationMinutes(slot))
+    }));
     setBookingStatus({ type: 'idle', message: '' });
-    setIsConfirmOpen(true);
   };
 
   const handleClearSelection = () => {
@@ -68,24 +73,9 @@ const useAppointmentBooking = () => {
     setIsConfirmOpen(false);
   };
 
-  const formatLocalDateTime = (value) => {
-    if (!value) {
-      return '';
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return '';
-    }
-
-    const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-    const local = new Date(date.getTime() - offsetMs);
-    return local.toISOString().slice(0, 16);
-  };
-
   const handleStartReschedule = (appointment) => {
     setRescheduleId(appointment.id);
-    setRescheduleAt(formatLocalDateTime(appointment.scheduledAt));
+    setRescheduleAt(formatLocalDateTimeInput(appointment.scheduledAt));
     setActionStatus({ type: 'idle', message: '' });
   };
 
@@ -122,13 +112,24 @@ const useAppointmentBooking = () => {
     }
   };
 
-  const handleCancelAppointment = async (appointmentId) => {
+  const handleRequestCancel = (appointmentId) => {
+    setCancelTargetId(appointmentId);
+  };
+
+  const handleDismissCancel = () => {
+    setCancelTargetId('');
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelTargetId) return;
+
     setActionLoading(true);
     setActionStatus({ type: 'idle', message: '' });
 
     try {
-      await cancelAppointment(appointmentId);
+      await cancelAppointment(cancelTargetId);
       setActionStatus({ type: 'success', message: 'Appointment canceled.' });
+      setCancelTargetId('');
       await loadAppointments();
     } catch (error) {
       setActionStatus({ type: 'error', message: error.message });
@@ -215,6 +216,7 @@ const useAppointmentBooking = () => {
     actionLoading,
     rescheduleId,
     rescheduleAt,
+    cancelTargetId,
     handleSelectSlot,
     handleClearSelection,
     handleOpenConfirm,
@@ -225,7 +227,9 @@ const useAppointmentBooking = () => {
     handleRescheduleChange,
     handleCancelReschedule,
     handleRescheduleSubmit,
-    handleCancelAppointment,
+    handleRequestCancel,
+    handleDismissCancel,
+    handleConfirmCancel,
     handleFetchMeeting
   };
 };

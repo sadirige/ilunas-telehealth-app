@@ -6,6 +6,7 @@ const patientRoutes = require('./routes/patients');
 const doctorRoutes = require('./routes/doctors');
 const appointmentRoutes = require('./routes/appointments');
 const availabilityRoutes = require('./routes/availabilities');
+const availabilityTemplateRoutes = require('./routes/availabilityTemplates');
 const recordRoutes = require('./routes/records');
 const noteRoutes = require('./routes/notes');
 const prescriptionRoutes = require('./routes/prescriptions');
@@ -32,6 +33,7 @@ const createApp = () => {
   app.use('/api/doctors', doctorRoutes);
   app.use('/api/appointments', appointmentRoutes);
   app.use('/api/availabilities', availabilityRoutes);
+  app.use('/api/availability-templates', availabilityTemplateRoutes);
   app.use('/api/records', recordRoutes);
   app.use('/api/notes', noteRoutes);
   app.use('/api/prescriptions', prescriptionRoutes);

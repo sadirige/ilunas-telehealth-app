@@ -28,17 +28,30 @@ const getStoredUser = () => {
 
 const App = () => {
 	const [user, setUser] = useState(getStoredUser);
+	const [isNewUser, setIsNewUser] = useState(() => {
+		try {
+			return localStorage.getItem('isNewUser') === 'true';
+		} catch {
+			return false;
+		}
+	});
 
 	const role = useMemo(() => user?.role, [user]);
 
-	const handleAuthSuccess = (nextUser) => {
+	const handleAuthSuccess = (nextUser, isNew = false) => {
 		setUser(nextUser);
+		setIsNewUser(isNew);
+		if (isNew) {
+			localStorage.setItem('isNewUser', 'true');
+		}
 	};
 
 	const handleLogout = () => {
 		localStorage.removeItem('authToken');
 		localStorage.removeItem('authUser');
+		localStorage.removeItem('isNewUser');
 		setUser(null);
+		setIsNewUser(false);
 	};
 
 	useEffect(() => {
@@ -56,19 +69,21 @@ const App = () => {
 	}
 
 	if (role === 'patient') {
+		const defaultSection = isNewUser ? 'profile' : 'overview';
 		return (
 			<Routes>
 				<Route path="/patient/:section?" element={<PatientProfilePage onLogout={handleLogout} />} />
-				<Route path="*" element={<Navigate to="/patient/overview" replace />} />
+				<Route path="*" element={<Navigate to={`/patient/${defaultSection}`} replace />} />
 			</Routes>
 		);
 	}
 
 	if (role === 'doctor') {
+		const defaultSection = isNewUser ? 'profile' : 'overview';
 		return (
 			<Routes>
 				<Route path="/doctor/:section?" element={<DoctorProfilePage onLogout={handleLogout} />} />
-				<Route path="*" element={<Navigate to="/doctor/overview" replace />} />
+				<Route path="*" element={<Navigate to={`/doctor/${defaultSection}`} replace />} />
 			</Routes>
 		);
 	}

@@ -9,6 +9,8 @@ import PatientDoctorDiscoveryPanel from '../components/patient/PatientDoctorDisc
 import PatientOverviewPanel from '../components/patient/PatientOverviewPanel';
 import PatientProfilePanel from '../components/patient/PatientProfilePanel';
 import PatientRecordsPanel from '../components/patient/PatientRecordsPanel';
+import BookingBar from '../components/ui/BookingBar';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 import useDoctorDiscovery from '../hooks/useDoctorDiscovery';
 import useAppointmentBooking from '../hooks/useAppointmentBooking';
 import { useConsultationNotes } from '../hooks/useConsultationNotes';
@@ -188,6 +190,7 @@ const PatientProfilePage = ({ onLogout }) => {
         onLogout={onLogout}
         title="Loading..."
         subtitle="Setting up your profile"
+        showEmergencyBanner
       >
         <div className="panel panel--loading">Loading your profile...</div>
       </AppShell>
@@ -204,6 +207,7 @@ const PatientProfilePage = ({ onLogout }) => {
       onLogout={onLogout}
       title={sectionMeta.title}
       subtitle={sectionMeta.subtitle}
+      showEmergencyBanner
     >
       {activeSection === 'overview' && (
         <PatientOverviewPanel
@@ -212,6 +216,7 @@ const PatientProfilePage = ({ onLogout }) => {
           notesCount={consultationNotes.notes.length}
           prescriptionsCount={prescriptionsHook.prescriptions.length}
           unreadCount={notifications.unreadCount}
+          onNavigate={handleNavigate}
         />
       )}
 
@@ -246,9 +251,13 @@ const PatientProfilePage = ({ onLogout }) => {
           recommendations={recommendations.recommendations}
           recommendationQuery={recommendations.recommendationQuery}
           recommendationStatus={recommendations.recommendationStatus}
+          availabilityMap={discovery.availabilityMap}
+          selectedSlot={booking.selectedSlot}
           setRecommendationQuery={recommendations.setRecommendationQuery}
           handleRecommendation={recommendations.handleRecommendation}
           handleLoadAvailability={discovery.handleLoadAvailability}
+          handleSelectSlot={booking.handleSelectSlot}
+          onOpenConfirm={booking.handleOpenConfirm}
         />
       )}
 
@@ -273,7 +282,7 @@ const PatientProfilePage = ({ onLogout }) => {
           onOpenConfirm={booking.handleOpenConfirm}
           onClearSelection={booking.handleClearSelection}
           onStartReschedule={booking.handleStartReschedule}
-          onCancelAppointment={booking.handleCancelAppointment}
+          onRequestCancel={booking.handleRequestCancel}
           onFetchMeeting={booking.handleFetchMeeting}
           onRescheduleChange={booking.handleRescheduleChange}
           onRescheduleSubmit={booking.handleRescheduleSubmit}
@@ -290,6 +299,27 @@ const PatientProfilePage = ({ onLogout }) => {
           onClose={booking.handleCloseConfirm}
           onSubmit={booking.handleBookingSubmit}
           onChange={booking.handleBookingChange}
+        />
+      )}
+
+      <ConfirmDialog
+        isOpen={Boolean(booking.cancelTargetId)}
+        title="Cancel appointment?"
+        message="This will free up the time slot. You can always book a new consultation later."
+        confirmLabel="Yes, cancel"
+        loading={booking.actionLoading}
+        onConfirm={booking.handleConfirmCancel}
+        onCancel={booking.handleDismissCancel}
+      />
+
+      {booking.hasSelection && !booking.isConfirmOpen && (
+        <BookingBar
+          selectedSlot={booking.selectedSlot}
+          onConfirm={booking.handleOpenConfirm}
+          onClear={booking.handleClearSelection}
+          onNavigate={
+            activeSection !== 'doctors' ? () => handleNavigate('doctors') : undefined
+          }
         />
       )}
 
@@ -322,6 +352,7 @@ const PatientProfilePage = ({ onLogout }) => {
           handleDoctorSearch={discovery.handleDoctorSearch}
           handleLoadAvailability={discovery.handleLoadAvailability}
           handleSelectSlot={booking.handleSelectSlot}
+          onOpenConfirm={booking.handleOpenConfirm}
         />
       )}
     </AppShell>

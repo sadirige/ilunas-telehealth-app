@@ -1,16 +1,23 @@
+import FormField from '../ui/FormField';
+import SlotPicker from '../ui/SlotPicker';
+
 const PatientAiPanel = ({
   recommendations,
   recommendationQuery,
   recommendationStatus,
+  availabilityMap,
+  selectedSlot,
   setRecommendationQuery,
   handleRecommendation,
-  handleLoadAvailability
+  handleLoadAvailability,
+  handleSelectSlot,
+  onOpenConfirm
 }) => (
   <section className="panel">
     <div className="section__header">
       <div>
         <h2>AI recommendations</h2>
-        <p>Describe your symptoms to find the best doctor fit.</p>
+        <p>Describe your symptoms to find doctors best suited to your needs.</p>
       </div>
     </div>
 
@@ -21,16 +28,18 @@ const PatientAiPanel = ({
     )}
 
     <form className="form" onSubmit={handleRecommendation}>
-      <label className="field">
-        Symptoms
-        <input
-          type="text"
+      <FormField
+        label="What are you experiencing?"
+        hint="Be specific — e.g., persistent cough, skin rash, anxiety"
+      >
+        <textarea
+          rows="3"
           value={recommendationQuery}
           onChange={(event) => setRecommendationQuery(event.target.value)}
-          placeholder="Headache, dizziness, stress"
+          placeholder="Describe your symptoms or health concern..."
           required
         />
-      </label>
+      </FormField>
       <button type="submit" className="primary">
         Get recommendations
       </button>
@@ -38,26 +47,61 @@ const PatientAiPanel = ({
 
     {recommendations.length > 0 && (
       <div className="cards">
-        {recommendations.map((doctor) => (
-          <article key={doctor.id} className="card">
-            <div className="card__header">
-              <div>
-                <h3>{doctor.name}</h3>
-                <p>{doctor.specialization}</p>
+        {recommendations.map((doctor) => {
+          const availability = availabilityMap[doctor.userId];
+          const hasSelectedSlot = availability?.slots?.some(
+            (slot) =>
+              selectedSlot?.slot?.id === slot.id &&
+              selectedSlot?.doctor?.userId === doctor.userId
+          );
+
+          return (
+            <article key={doctor.id} className="card doctor-card">
+              <div className="doctor-card__header">
+                <div className="doctor-card__avatar" aria-hidden="true">
+                  {doctor.name?.charAt(0) || 'D'}
+                </div>
+                <div className="doctor-card__info">
+                  <h3>{doctor.name}</h3>
+                  <p className="doctor-card__specialization">{doctor.specialization}</p>
+                </div>
+                <span className="pill pill--accent">AI match</span>
               </div>
-              <span className="pill">AI match</span>
-            </div>
-            <p>{doctor.bio}</p>
-            <button
-              type="button"
-              className="ghost"
-              onClick={() => handleLoadAvailability(doctor.userId)}
-            >
-              View availability
-            </button>
-          </article>
-        ))}
+              {doctor.bio && <p className="doctor-card__bio">{doctor.bio}</p>}
+
+              {availability?.status === 'ready' && availability.slots.length > 0 ? (
+                <>
+                  <SlotPicker
+                    slots={availability.slots}
+                    selectedSlotId={hasSelectedSlot ? selectedSlot?.slot?.id : undefined}
+                    onSelectSlot={(slot) => handleSelectSlot(doctor, slot)}
+                  />
+                  {hasSelectedSlot && (
+                    <button type="button" className="primary" onClick={onOpenConfirm}>
+                      Book this time
+                    </button>
+                  )}
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="primary doctor-card__view-btn"
+                  onClick={() => handleLoadAvailability(doctor.userId)}
+                  disabled={availability?.status === 'loading'}
+                >
+                  {availability?.status === 'loading'
+                    ? 'Loading availability...'
+                    : 'View available times'}
+                </button>
+              )}
+            </article>
+          );
+        })}
       </div>
+    )}
+
+    {recommendations.length === 0 && recommendationStatus.type === 'success' && (
+      <p className="hint">No matching doctors found. Try describing your symptoms differently.</p>
     )}
   </section>
 );

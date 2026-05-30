@@ -11,6 +11,7 @@ import DoctorSendLinkModal from '../components/doctor/DoctorSendLinkModal';
 import DoctorTodayPanel from '../components/doctor/DoctorTodayPanel';
 import NotificationsPanel from '../components/shared/NotificationsPanel';
 import useDoctorAvailability from '../hooks/useDoctorAvailability';
+import useAvailabilityTemplates from '../hooks/useAvailabilityTemplates';
 import useDoctorAppointments from '../hooks/useDoctorAppointments';
 import useDoctorProfileForm from '../hooks/useDoctorProfileForm';
 import { useConsultationNotes } from '../hooks/useConsultationNotes';
@@ -64,6 +65,7 @@ const DoctorProfilePage = ({ onLogout }) => {
 
   const profile = useDoctorProfileForm(storedUser?.displayName || '');
   const availability = useDoctorAvailability();
+  const availabilityTemplates = useAvailabilityTemplates(availability.refreshAvailabilities);
   const notifications = useNotifications();
   const appointmentsHook = useDoctorAppointments();
   const meetingLink = useMeetingLinkGenerator();
@@ -241,6 +243,7 @@ const DoctorProfilePage = ({ onLogout }) => {
           notesCount={consultationNotes.notes.length}
           prescriptionsCount={prescriptionsHook.prescriptions.length}
           unreadCount={notifications.unreadCount}
+          onNavigate={handleNavigate}
         />
       )}
 
@@ -284,6 +287,10 @@ const DoctorProfilePage = ({ onLogout }) => {
         <DoctorAvailabilityPanel
           availabilityForm={availability.form}
           availabilities={availability.availabilities}
+          weekStart={availability.weekStart}
+          weekAvailabilities={availability.weekAvailabilities}
+          calendarSelection={availability.calendarSelection}
+          showManualForm={availability.showManualForm}
           previewSlots={availability.previewSlots}
           previewError={availability.previewError}
           availabilityStatus={availability.status}
@@ -292,6 +299,24 @@ const DoctorProfilePage = ({ onLogout }) => {
           handleAvailabilityChange={availability.handleChange}
           handleAvailabilitySubmit={availability.handleSubmit}
           handleAvailabilityDelete={availability.handleDelete}
+          handleWeekChange={availability.handleWeekChange}
+          handleGoToToday={availability.handleGoToToday}
+          handleCalendarSelectRange={availability.handleCalendarSelectRange}
+          handleCalendarClearSelection={availability.handleCalendarClearSelection}
+          handleCalendarSubmit={availability.handleCalendarSubmit}
+          templates={availabilityTemplates.templates}
+          templateForm={availabilityTemplates.templateForm}
+          templateStatus={availabilityTemplates.templateStatus}
+          templatesLoading={availabilityTemplates.templatesLoading}
+          templatesSaving={availabilityTemplates.templatesSaving}
+          templatesApplying={availabilityTemplates.templatesApplying}
+          templatePreviewCount={availabilityTemplates.templatePreviewCount}
+          activeTemplatePreviewCount={availabilityTemplates.activeTemplatePreviewCount}
+          handleTemplateFormChange={availabilityTemplates.handleTemplateFormChange}
+          handleCreateTemplates={availabilityTemplates.handleCreateTemplates}
+          handleToggleActive={availabilityTemplates.handleToggleActive}
+          handleDeleteTemplate={availabilityTemplates.handleDeleteTemplate}
+          handleApplyAll={availabilityTemplates.handleApplyAll}
         />
       )}
 
