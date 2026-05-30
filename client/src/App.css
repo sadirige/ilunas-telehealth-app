@@ -458,6 +458,20 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+/* Hide browser's built-in password reveal icon */
+.field input[type="password"]::-webkit-credentials-auto-fill-button,
+.field input[type="password"]::-webkit-reveal-password-button {
+  display: none;
+}
+
+.field input[type="password"]::-ms-reveal {
+  display: none;
+}
+
+.field input[type="password"]::-moz-reveal {
+  display: none;
+}
+
 .upload-row {
   display: flex;
   gap: 12px;
