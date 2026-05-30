@@ -6,7 +6,7 @@ const DisclosurePanel = ({
   className = '',
   children
 }) => (
-  <details className={`disclosure ${className}`.trim()} defaultOpen={defaultOpen}>
+  <details className={`disclosure ${className}`.trim()} open={defaultOpen}>
     <summary className="disclosure__summary">
       <span className="disclosure__heading">
         <span className="disclosure__title">{title}</span>
