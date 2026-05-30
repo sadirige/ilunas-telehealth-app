@@ -3,7 +3,6 @@ const PatientOverviewPanel = ({
   recordsCount,
   notesCount,
   prescriptionsCount,
-  unreadCount,
   onNavigate
 }) => (
   <section className="panel">
@@ -45,11 +44,11 @@ const PatientOverviewPanel = ({
       <button
         type="button"
         className="dashboard__card dashboard__card--action"
-        onClick={() => onNavigate('notifications')}
+        onClick={() => onNavigate('records')}
       >
         <span className="dashboard__label">Prescriptions</span>
         <span className="dashboard__value">{prescriptionsCount}</span>
-        <span className="dashboard__meta">{unreadCount} unread updates</span>
+        <span className="dashboard__meta">View in medical records</span>
       </button>
     </div>
 
