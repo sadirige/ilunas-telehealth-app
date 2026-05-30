@@ -1,4 +1,5 @@
 import useAuthForm from '../hooks/useAuthForm';
+import BrandLogo from '../components/ui/BrandLogo';
 import '../App.css';
 
 const AuthPage = ({ onAuthSuccess }) => {
@@ -22,26 +23,31 @@ const AuthPage = ({ onAuthSuccess }) => {
 
   return (
     <div className="shell">
+      <div className="auth-topbar">
+        <BrandLogo subtitle="Telehealth Platform" />
+        <p className="auth-topbar__tagline">Secure virtual care, anytime.</p>
+      </div>
+
       <header className="hero">
         <div className="hero__content">
-          <div className="badge">Telehealth MVP</div>
-          <h1>Care that feels human, even on a screen.</h1>
+          <div className="badge">Trusted telehealth</div>
+          <h1>Healthcare that meets you where you are.</h1>
           <p>
-            Book trusted doctors, manage your schedule, and keep your medical history in one
-            calm space.
+            Book consultations with verified clinicians, manage your health records,
+            and join virtual visits — all in one secure place.
           </p>
           <div className="hero__stats">
-            <div>
+            <div className="hero__stat">
               <span className="stat__value">24/7</span>
               <span className="stat__label">Secure access</span>
             </div>
-            <div>
+            <div className="hero__stat">
               <span className="stat__value">15 min</span>
               <span className="stat__label">Avg. booking time</span>
             </div>
-            <div>
-              <span className="stat__value">HIPAA-ready</span>
-              <span className="stat__label">Compliance posture</span>
+            <div className="hero__stat">
+              <span className="stat__value">Encrypted</span>
+              <span className="stat__label">Data protection</span>
             </div>
           </div>
         </div>
@@ -79,6 +85,7 @@ const AuthPage = ({ onAuthSuccess }) => {
                   value={loginForm.email}
                   onChange={handleLoginChange}
                   placeholder="you@email.com"
+                  autoComplete="email"
                   required
                 />
               </label>
@@ -91,6 +98,7 @@ const AuthPage = ({ onAuthSuccess }) => {
                     value={loginForm.password}
                     onChange={handleLoginChange}
                     placeholder="••••••••"
+                    autoComplete="current-password"
                     required
                   />
                   <button
@@ -106,7 +114,7 @@ const AuthPage = ({ onAuthSuccess }) => {
               <button type="submit" className="primary" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
-              <p className="hint">We use JWT-based authentication for secure sessions.</p>
+              <p className="hint">Your session is protected with secure authentication.</p>
             </form>
           ) : (
             <form className="form" onSubmit={handleRegisterSubmit}>
@@ -118,6 +126,7 @@ const AuthPage = ({ onAuthSuccess }) => {
                   value={registerForm.displayName}
                   onChange={handleRegisterChange}
                   placeholder="Your name"
+                  autoComplete="name"
                   required
                 />
               </label>
@@ -129,6 +138,7 @@ const AuthPage = ({ onAuthSuccess }) => {
                   value={registerForm.email}
                   onChange={handleRegisterChange}
                   placeholder="you@email.com"
+                  autoComplete="email"
                   required
                 />
               </label>
@@ -141,6 +151,7 @@ const AuthPage = ({ onAuthSuccess }) => {
                     value={registerForm.password}
                     onChange={handleRegisterChange}
                     placeholder="Minimum 8 characters"
+                    autoComplete="new-password"
                     required
                   />
                   <button
@@ -166,7 +177,7 @@ const AuthPage = ({ onAuthSuccess }) => {
               <button type="submit" className="primary" disabled={loading}>
                 {loading ? 'Creating account...' : 'Create account'}
               </button>
-              <p className="hint">Next, we will ask for your profile details.</p>
+              <p className="hint">Next, complete your profile to get started.</p>
             </form>
           )}
         </div>
@@ -176,22 +187,25 @@ const AuthPage = ({ onAuthSuccess }) => {
         <div>
           <h2>Built for patients and clinicians</h2>
           <p>
-            Transparent appointment status, clinician availability, and shared medical records
-            keep everyone aligned.
+            Clear appointment statuses, real-time availability, and connected medical
+            records keep everyone aligned throughout your care journey.
           </p>
         </div>
         <div className="trust__grid">
           <article>
+            <div className="trust__icon" aria-hidden="true">🔒</div>
             <h3>Secure by design</h3>
-            <p>Role-based access keeps patient and doctor data separated.</p>
+            <p>Role-based access keeps patient and doctor data properly separated.</p>
           </article>
           <article>
+            <div className="trust__icon" aria-hidden="true">📅</div>
             <h3>Fast booking</h3>
             <p>Find doctors by specialty, symptoms, and real-time availability.</p>
           </article>
           <article>
-            <h3>Continuity</h3>
-            <p>Records, notes, and prescriptions remain connected to each visit.</p>
+            <div className="trust__icon" aria-hidden="true">📋</div>
+            <h3>Care continuity</h3>
+            <p>Records, notes, and prescriptions stay linked to each visit.</p>
           </article>
         </div>
       </section>
